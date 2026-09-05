@@ -1,3 +1,8 @@
+export interface DestinationCoordinates {
+  latitude: number
+  longitude: number
+}
+
 export interface Destination {
   id: number
   name: string
@@ -9,4 +14,5 @@ export interface Destination {
   image: string
   description: string
   highlights: string[]
+  coordinates: DestinationCoordinates
 }

@@ -26,14 +26,14 @@ import { navLinks } from '../../data/navLinks'
   background: rgb(var(--scrim-rgb));
   color: var(--color-on-dark);
   margin-top: 3rem;
-  padding: 2.5rem 0 1.25rem;
+  padding: 2rem 0 1rem;
 }
 
 .footer-inner {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .footer-brand h3 {
@@ -50,7 +50,7 @@ import { navLinks } from '../../data/navLinks'
 
 .footer-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.25rem;
   align-items: flex-start;
 }
 

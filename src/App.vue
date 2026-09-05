@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import AppLayout from './components/layout/AppLayout.vue'
 import Navbar from './components/layout/Navbar.vue'
-import Footer from './components/layout/Footer.vue'
 
 const route = useRoute()
-const isAuthPage = computed(() => route.path === '/login' || route.path === '/signup')
+const shell = computed(() => route.meta.shell ?? 'public')
+const isAuthPage = computed(() => shell.value === 'auth')
 </script>
 
 <template>
-  <Navbar />
-  <main>
+  <template v-if="isAuthPage">
+    <Navbar />
+    <main class="auth-main">
+      <router-view />
+    </main>
+  </template>
+
+  <AppLayout v-else>
     <router-view />
-  </main>
-  <Footer v-if="!isAuthPage" />
+  </AppLayout>
 </template>
 
-<style scoped></style>
+<style scoped>
+main.auth-main {
+  padding-top: var(--navbar-height);
+}
+</style>

@@ -5,7 +5,6 @@ import MobileMenu from './MobileMenu.vue'
 import Icon from '../common/Icon.vue'
 import { useAuth } from '../../composables/useAuth'
 import { useTheme } from '../../composables/useTheme'
-import { useFavorites } from '../../composables/useFavorites'
 import { navLinks as links } from '../../data/navLinks'
 
 const route = useRoute()
@@ -14,7 +13,10 @@ const isNotificationsOpen = ref(false)
 const notificationsRef = ref<HTMLElement | null>(null)
 const { user, isLoggedIn } = useAuth()
 const { theme, toggleTheme } = useTheme()
-const { favoriteIds } = useFavorites()
+
+const emit = defineEmits<{
+  toggleSidebar: []
+}>()
 
 const isAuthPage = computed(() => route.path === '/login' || route.path === '/signup')
 
@@ -78,16 +80,6 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 
         <div class="nav-right">
           <div class="nav-actions">
-            <router-link
-              to="/favorites"
-              class="icon-btn"
-              :class="{ active: isActive('/favorites') }"
-              aria-label="Favorites"
-            >
-              <Icon :name="favoriteIds.length ? 'bookmark-filled' : 'bookmark'" :size="17" />
-              <span v-if="favoriteIds.length" class="icon-badge">{{ favoriteIds.length }}</span>
-            </router-link>
-
             <div ref="notificationsRef" class="notifications-wrap">
               <button
                 type="button"
@@ -125,6 +117,15 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
               <Icon v-else name="user" :size="16" />
             </router-link>
           </div>
+
+          <button
+            class="sidebar-toggle"
+            type="button"
+            aria-label="Toggle application sidebar"
+            @click="emit('toggleSidebar')"
+          >
+            <Icon name="map" :size="17" />
+          </button>
 
           <button
             class="menu-toggle"
@@ -167,11 +168,13 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 
 .navbar-inner {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
+  width: 100%;
+  max-width: none;
   min-height: var(--navbar-height);
-  padding: 0.5rem 0;
+  padding: 0.4rem 1rem 0.4rem 0;
 }
 
 .brand {
@@ -180,8 +183,9 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   gap: 0.6rem;
   grid-column: 1;
   justify-self: start;
-  margin-left: 1rem;
-  font-size: 24px;
+  width: var(--sidebar-width);
+  padding-left: 1.25rem;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-primary);
@@ -192,8 +196,8 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
   background: var(--color-primary);
   color: var(--color-white);
@@ -219,9 +223,9 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 
 .nav-link {
   font-weight: 500;
-  font-size: 16px;
+  font-size: var(--fs-navbar);
   color: var(--color-text);
-  padding: 0.45rem 0.8rem;
+  padding: 0.4rem 0.7rem;
   border-radius: 999px;
   transition: background 0.2s, color 0.2s;
   white-space: nowrap;
@@ -251,7 +255,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.65rem;
   flex-shrink: 0;
 }
 
@@ -260,8 +264,8 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   background: none;
@@ -360,8 +364,8 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--color-accent);
   color: var(--color-primary);
@@ -394,6 +398,19 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   flex-shrink: 0;
 }
 
+.sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: 50%;
+  background: none;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
 .menu-toggle span {
   display: block;
   height: 2px;
@@ -406,10 +423,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
     gap: 1.1rem;
   }
 
-  .brand {
-    font-size: 22px;
-    margin-left: 0.25rem;
-  }
+  .brand { font-size: 21px; }
 
   .nav-links {
     gap: 0.15rem;
@@ -431,8 +445,22 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 }
 
 @media (max-width: 900px) {
+  .navbar-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-left: 1rem;
+  }
+
+  .brand {
+    width: auto;
+    padding-left: 0;
+  }
+
   .nav-links {
     display: none;
+  }
+
+  .sidebar-toggle {
+    display: flex;
   }
 
   .menu-toggle {

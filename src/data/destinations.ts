@@ -9,10 +9,11 @@ export const destinations: Destination[] = [
     rating: 4.9,
     bestTime: "November - February",
     estimatedCost: "$30 - $60 per day",
-    image: "https://picsum.photos/seed/angkor-wat/800/600",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/6e/59/34/caption.jpg?w=900&h=500&s=1",
     description:
       "A vast temple complex and UNESCO World Heritage Site, one of the largest religious monuments in the world.",
     highlights: ["Sunrise temple views", "Ancient stone carvings", "Guided history tours", "Cultural photography"],
+    coordinates: { latitude: 13.4125, longitude: 103.867 },
   },
   {
     id: 2,
@@ -22,10 +23,11 @@ export const destinations: Destination[] = [
     rating: 4.6,
     bestTime: "November - February",
     estimatedCost: "$25 - $50 per day",
-    image: "https://picsum.photos/seed/royal-palace/800/600",
+    image: "https://www.novotelphnompenhbkk1.com/wp-content/uploads/sites/53/2023/08/royal-palace-1920x1200.jpg",
     description:
       "The official residence of the King of Cambodia, known for its striking architecture and the Silver Pagoda.",
     highlights: ["Royal architecture", "Silver Pagoda", "Manicured gardens", "Local guided tours"],
+    coordinates: { latitude: 11.5636, longitude: 104.9317 },
   },
   {
     id: 3,
@@ -35,10 +37,11 @@ export const destinations: Destination[] = [
     rating: 4.5,
     bestTime: "December - April",
     estimatedCost: "$35 - $70 per day",
-    image: "https://picsum.photos/seed/koh-rong/800/600",
+    image: "https://i.ytimg.com/vi/VCnDTL4U2lQ/maxresdefault.jpg",
     description:
       "A laid-back island known for white sand beaches, clear water, and glowing plankton at night.",
     highlights: ["White sand beaches", "Glowing plankton at night", "Snorkeling", "Island hopping"],
+    coordinates: { latitude: 10.724, longitude: 103.255 },
   },
   {
     id: 4,
@@ -48,10 +51,11 @@ export const destinations: Destination[] = [
     rating: 4.7,
     bestTime: "April - October",
     estimatedCost: "$40 - $90 per day",
-    image: "https://picsum.photos/seed/bali/800/600",
+    image: "https://balirescentre.com/wp-content/uploads/2025/12/Kelingking-Beach-Nusa-Penida.webp",
     description:
       "A tropical island known for its beaches, rice terraces, temples, and vibrant culture.",
     highlights: ["Beautiful scenery", "Rice terraces", "Cultural temples", "Local food"],
+    coordinates: { latitude: -8.4095, longitude: 115.1889 },
   },
   {
     id: 5,
@@ -61,10 +65,11 @@ export const destinations: Destination[] = [
     rating: 4.8,
     bestTime: "June - August",
     estimatedCost: "$70 - $150 per day",
-    image: "https://picsum.photos/seed/eiffel-tower/800/600",
+    image: "https://www.travelandleisure.com/thmb/SPUPzO88ZXq6P4Sm4mC5Xuinoik=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/eiffel-tower-paris-france-EIFFEL0217-6ccc3553e98946f18c893018d5b42bde.jpg",
     description:
       "An iconic iron landmark in Paris and one of the most recognizable structures in the world.",
     highlights: ["City skyline views", "Evening light show", "Nearby cafes", "Photography spots"],
+    coordinates: { latitude: 48.8584, longitude: 2.2945 },
   },
   {
     id: 6,
@@ -74,10 +79,11 @@ export const destinations: Destination[] = [
     rating: 4.8,
     bestTime: "March - May",
     estimatedCost: "$80 - $160 per day",
-    image: "https://picsum.photos/seed/tokyo/800/600",
+    image: "https://media.digitalnomads.world/wp-content/uploads/2021/02/20120635/tokyo-for-digital-nomads.jpg",
     description:
       "A bustling metropolis blending futuristic technology with traditional Japanese culture.",
     highlights: ["Modern skyline", "Traditional temples", "Local street food", "Efficient transit"],
+    coordinates: { latitude: 35.6762, longitude: 139.6503 },
   },
   {
     id: 7,
@@ -87,10 +93,11 @@ export const destinations: Destination[] = [
     rating: 4.9,
     bestTime: "July - September",
     estimatedCost: "$50 - $100 per day",
-    image: "https://picsum.photos/seed/mount-fuji/800/600",
+    image: "https://cdn-imgix.headout.com/media/images/22fba69863f7d95408b199a4796db8e8-Fujinomiya%205th%20Station.jpg?auto=compress%2Cformat&w=1222.3999999999999&h=687.6&q=90&ar=16%3A9&crop=faces&fit=crop",
     description:
       "Japan's tallest peak and an iconic symmetrical volcano, popular for hiking and scenic views.",
     highlights: ["Sunrise hiking", "Scenic lake views", "Outdoor activities", "Photography spots"],
+    coordinates: { latitude: 35.3606, longitude: 138.7274 },
   },
   {
     id: 8,
@@ -100,10 +107,11 @@ export const destinations: Destination[] = [
     rating: 4.9,
     bestTime: "December - March",
     estimatedCost: "$90 - $180 per day",
-    image: "https://picsum.photos/seed/swiss-alps/800/600",
+    image: "https://ryderwalker.com/wp-content/uploads/2018/05/matterhornDestinationPage-900x563.jpg",
     description:
       "Majestic mountain ranges offering skiing, hiking, and breathtaking alpine scenery.",
     highlights: ["Alpine scenery", "Skiing and hiking", "Mountain villages", "Cable car rides"],
+    coordinates: { latitude: 46.8182, longitude: 8.2275 },
   },
   {
     id: 9,
@@ -113,10 +121,11 @@ export const destinations: Destination[] = [
     rating: 4.8,
     bestTime: "March - May",
     estimatedCost: "$60 - $120 per day",
-    image: "https://picsum.photos/seed/grand-canyon/800/600",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsW1RBsqP6JdzHZhFlr3r_K9fIgHRRr4oQsPekRaqfPiDwKHZ3b5pLprVP&s=10",
     description:
       "A massive canyon carved by the Colorado River, famous for its layered red rock formations.",
     highlights: ["Dramatic canyon views", "Hiking trails", "Sunset photography", "Outdoor activities"],
+    coordinates: { latitude: 36.1069, longitude: -112.1129 },
   },
   {
     id: 10,
@@ -126,10 +135,11 @@ export const destinations: Destination[] = [
     rating: 4.7,
     bestTime: "May - September",
     estimatedCost: "$70 - $140 per day",
-    image: "https://picsum.photos/seed/santorini/800/600",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQagzgQ_ybdHe-TeGlPKYjQrjXL1fX0PHdhzqyUO8315C6j2TZW1RIe2LQ&s=10",
     description:
       "A stunning Greek island known for whitewashed buildings and dramatic sunsets over the caldera.",
     highlights: ["Whitewashed architecture", "Caldera sunsets", "Local wineries", "Beautiful scenery"],
+    coordinates: { latitude: 36.3932, longitude: 25.4615 },
   },
   {
     id: 11,
@@ -139,10 +149,11 @@ export const destinations: Destination[] = [
     rating: 4.7,
     bestTime: "January - March",
     estimatedCost: "$150 - $300 per day",
-    image: "https://picsum.photos/seed/kilimanjaro/800/600",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpcYymhu5F8FvUFh5XKhhl9Ikn5f80LeIl63IVHGOyPaUWaUxE3yHyInk&s=10",
     description:
       "Africa's tallest mountain, a popular multi-day trekking destination with routes through diverse climate zones.",
     highlights: ["Multi-day trekking", "Diverse climate zones", "Summit sunrise", "Outdoor activities"],
+    coordinates: { latitude: -3.0674, longitude: 37.3556 },
   },
   {
     id: 12,
@@ -152,9 +163,10 @@ export const destinations: Destination[] = [
     rating: 4.6,
     bestTime: "October - December",
     estimatedCost: "$60 - $120 per day",
-    image: "https://picsum.photos/seed/osaka/800/600",
+    image: "https://photos.smugmug.com/Osaka/Osaka-Districts/i-RR8KGmg/0/L/Osaka_Bay_Area-L.jpg",
     description:
       "Japan's kitchen, famous for street food markets, takoyaki, and a lively food-first culture.",
     highlights: ["Street food markets", "Local food", "Night skyline views", "Cultural attractions"],
+    coordinates: { latitude: 34.6937, longitude: 135.5023 },
   },
 ]

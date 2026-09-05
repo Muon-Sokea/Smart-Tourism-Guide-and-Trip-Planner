@@ -1,0 +1,86 @@
+@import "tailwindcss";
+@import "./variables.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+main {
+  display: block;
+  padding-top: var(--navbar-height);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+/* Type scale defaults — component styles only need to override where a
+   heading/paragraph intentionally differs from its tag's default size. */
+h1 {
+  margin: 0;
+  font-size: var(--fs-page-title);
+  font-weight: 700;
+}
+
+h2 {
+  margin: 0;
+  font-size: var(--fs-section-title);
+  font-weight: 700;
+}
+
+h3 {
+  margin: 0;
+  font-size: var(--fs-card-title);
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+button {
+  font-size: var(--fs-button);
+  font-weight: 600;
+}
+
+label {
+  font-size: var(--fs-label);
+  font-weight: 500;
+}
+
+small {
+  font-size: var(--fs-small);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}

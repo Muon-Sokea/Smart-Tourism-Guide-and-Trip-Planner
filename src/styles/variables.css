@@ -1,0 +1,83 @@
+:root {
+  /* The 3 main colors — do not introduce others */
+  --color-primary: #1b4332;   /* Dark Green */
+  --color-accent: #d4a017;    /* Warm Gold */
+  --color-white: #ffffff;     /* White */
+
+  /* Tints/shades derived from the 3 main colors only (not new colors) */
+  --color-primary-light: #2d6a4f;
+  --color-text: #1b4332;
+  --color-muted: #52796f;
+  --color-bg: #f7f7f7;
+
+  /* Raw channels for --color-primary/--color-accent, so alpha tints (badges,
+     borders, subtle section backgrounds) stay theme-aware instead of hardcoding rgba(). */
+  --color-primary-rgb: 27, 67, 50;
+  --color-accent-rgb: 212, 160, 23;
+
+  /* Stable dark surface — does NOT flip in dark mode. Used only where text must
+     stay light regardless of theme: photo scrims (hero) and the footer bar. */
+  --scrim-rgb: 27, 67, 50;
+  --color-on-dark: #ffffff;
+
+  --radius: 12px;
+  --shadow: 0 4px 12px rgba(27, 67, 50, 0.12);
+  --navbar-height: 80px;
+  --sidebar-width: 248px;
+
+  /* Typography scale — desktop */
+  --fs-hero-title: 55px;
+  --fs-page-title: 42px;
+  --fs-section-title: 26px;
+  --fs-card-title: 18px;
+  --fs-stat: 28px;
+  --fs-body: 15px;
+  --fs-card-desc: 14px;
+  --fs-navbar: 15px;
+  --fs-button: 14px;
+  --fs-label: 14px;
+  --fs-small: 13px;
+}
+
+/* Dark theme — same 3-color system, inverted surfaces. Toggled via
+   data-theme="dark" on <html> by useTheme.ts. */
+:root[data-theme='dark'] {
+  --color-primary: #74c69d;
+  --color-accent: #e0ab1f;
+  --color-white: #16281f;
+
+  --color-primary-light: #3f7c5c;
+  --color-text: #e6f0ea;
+  --color-muted: #9fb8ab;
+  --color-bg: #0d1912;
+  --color-primary-rgb: 116, 198, 157;
+  --color-accent-rgb: 224, 171, 31;
+
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* Typography scale — tablet */
+@media (max-width: 1024px) {
+  :root {
+    --fs-hero-title: 46px;
+    --fs-page-title: 34px;
+    --fs-section-title: 24px;
+    --fs-card-title: 18px;
+    --fs-stat: 28px;
+    --fs-navbar: 15px;
+  }
+}
+
+/* Typography scale — mobile */
+@media (max-width: 640px) {
+  :root {
+    --fs-hero-title: 36px;
+    --fs-page-title: 31px;
+    --fs-section-title: 24px;
+    --fs-card-title: 18px;
+    --fs-stat: 26px;
+    --fs-label: 13px;
+    --fs-small: 12px;
+    --fs-navbar: 16px;
+  }
+}
