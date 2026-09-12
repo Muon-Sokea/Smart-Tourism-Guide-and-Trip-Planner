@@ -3,6 +3,7 @@ import type { ExploreContent } from '../../types/explore'
 import Icon from '../common/Icon.vue'
 import RatingDisplay from './RatingDisplay.vue'
 import { useFavorites } from '../../composables/useFavorites'
+import { t } from '../../composables/useLanguage'
 import { useRoute } from 'vue-router'
 
 const props = defineProps<{
@@ -21,7 +22,7 @@ const route = useRoute()
         type="button"
         class="favorite-btn"
         :aria-pressed="isFavorite(props.item.id)"
-        :aria-label="isFavorite(props.item.id) ? 'Remove from favorites' : 'Add to favorites'"
+        :aria-label="isFavorite(props.item.id) ? t('Remove from favorites') : t('Add to favorites')"
         @click="toggleFavorite(props.item.id)"
       >
         <Icon :name="isFavorite(props.item.id) ? 'heart-filled' : 'heart'" :size="17" />
@@ -44,9 +45,9 @@ const route = useRoute()
           :to="{ name: 'service-details', params: { type: props.item.type, id: props.item.id }, query: { from: route.fullPath } }"
           class="details-link"
         >
-          View Details
+          {{ t('View Details') }}
         </router-link>
-        <router-link :to="`/book/${props.item.type}/${props.item.id}`" class="book-link">{{ props.item.type === 'restaurant' ? 'Reserve' : 'Book Now' }}</router-link>
+        <router-link :to="`/book/${props.item.type}/${props.item.id}`" class="book-link">{{ props.item.type === 'restaurant' ? t('Reserve') : t('Book Now') }}</router-link>
       </div>
     </div>
   </article>
@@ -156,26 +157,33 @@ const route = useRoute()
 }
 
 .details-link {
-  align-self: flex-start;
-  margin-top: auto;
-  padding: 0.4rem 0.8rem;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.8rem;
   border-radius: 8px;
   background: var(--color-primary);
   color: var(--color-white);
   font-size: var(--fs-button);
   font-weight: 600;
+  text-align: center;
 }
 
-.card-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: auto; }
+.card-actions { display: flex; gap: 0.5rem; margin-top: auto; }
 
 .book-link {
-  align-self: flex-start;
-  padding: 0.4rem 0.8rem;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.8rem;
   border: 1px solid var(--color-primary);
   border-radius: 8px;
   color: var(--color-primary);
   font-size: var(--fs-button);
   font-weight: 600;
+  text-align: center;
 }
 
 .book-link:hover { background: var(--color-accent); border-color: var(--color-accent); }

@@ -9,6 +9,7 @@ import TripSummary from '../../components/planner/TripSummary.vue'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 import type { BudgetCategory } from '../../types/trip'
+import { t } from '../../composables/useLanguage'
 
 const {
   trip,
@@ -68,17 +69,17 @@ const checklistProgress = computed(() =>
 
 function saveTrip() {
   if (!tripForm.value.name.trim() || !tripForm.value.destination || !tripForm.value.startDate || !tripForm.value.endDate) {
-    formError.value = 'Add a trip name, destination, and both dates before saving.'
+    formError.value = t('Add a trip name, destination, and both dates before saving.')
     return
   }
   if (tripForm.value.startDate > tripForm.value.endDate) {
-    formError.value = 'The end date must be on or after the start date.'
+    formError.value = t('The end date must be on or after the start date.')
     return
   }
   formError.value = ''
   setTripInfo({ ...tripForm.value, name: tripForm.value.name.trim() })
   saveToMyTrips()
-  saveMessage.value = 'Trip saved to My Trips.'
+  saveMessage.value = t('Trip saved to My Trips.')
   window.setTimeout(() => (saveMessage.value = ''), 2500)
 }
 
@@ -106,61 +107,61 @@ function addFromPanel(destination: Destination) {
     <div class="container">
       <header class="planner-header">
         <div>
-          <p class="eyebrow">Plan your journey</p>
-          <h1>Trip Planner</h1>
-          <p class="planner-intro">Shape an idea into an itinerary, budget, and checklist you can take with you.</p>
+          <p class="eyebrow">{{ t('Plan your journey') }}</p>
+          <h1>{{ t('Trip Planner') }}</h1>
+          <p class="planner-intro">{{ t('Shape an idea into an itinerary, budget, and checklist you can take with you.') }}</p>
         </div>
         <div class="save-area">
           <span v-if="lastAddedMessage" class="save-message added-message" role="status">{{ lastAddedMessage }}</span>
           <span v-else-if="saveMessage" class="save-message">{{ saveMessage }}</span>
-          <Button variant="accent" @click="saveTrip"><Icon name="check" :size="16" /> Save Trip</Button>
+          <Button variant="accent" @click="saveTrip"><Icon name="check" :size="16" /> {{ t('Save Trip') }}</Button>
         </div>
       </header>
 
       <p v-if="formError" class="form-error" role="alert">{{ formError }}</p>
 
       <section class="planner-section trip-info-section">
-        <div class="section-heading"><p class="eyebrow">Step 1</p><h2>Create your trip</h2></div>
+        <div class="section-heading"><p class="eyebrow">{{ t('Step 1') }}</p><h2>{{ t('Create your trip') }}</h2></div>
         <form class="trip-form" @submit.prevent="saveTrip">
-          <label><span>Trip name</span><input v-model="tripForm.name" type="text" placeholder="My Siem Reap Adventure" /></label>
-          <label><span>Destination</span><select v-model="tripForm.destination"><option value="" disabled>Select a destination</option><option v-for="destination in destinations" :key="destination.id" :value="`${destination.name}, ${destination.country}`">{{ destination.name }}, {{ destination.country }}</option></select></label>
-          <label><span>Start date</span><input v-model="tripForm.startDate" type="date" /></label>
-          <label><span>End date</span><input v-model="tripForm.endDate" type="date" :min="tripForm.startDate" /></label>
-          <Button variant="primary" type="submit">Create Trip</Button>
+          <label><span>{{ t('Trip name') }}</span><input v-model="tripForm.name" type="text" :placeholder="t('My Siem Reap Adventure')" /></label>
+          <label><span>{{ t('Destination') }}</span><select v-model="tripForm.destination"><option value="" disabled>{{ t('Select a destination') }}</option><option v-for="destination in destinations" :key="destination.id" :value="`${destination.name}, ${destination.country}`">{{ destination.name }}, {{ destination.country }}</option></select></label>
+          <label><span>{{ t('Start date') }}</span><input v-model="tripForm.startDate" type="date" /></label>
+          <label><span>{{ t('End date') }}</span><input v-model="tripForm.endDate" type="date" :min="tripForm.startDate" /></label>
+          <Button variant="primary" type="submit">{{ t('Create Trip') }}</Button>
         </form>
       </section>
 
       <div class="planner-layout">
         <main class="planner-main">
           <section class="planner-section itinerary-section">
-            <div class="section-heading section-heading-row"><div><p class="eyebrow">Step 2</p><h2>Itinerary</h2></div><span class="section-count">{{ trip.items.length }} activities</span></div>
+            <div class="section-heading section-heading-row"><div><p class="eyebrow">{{ t('Step 2') }}</p><h2>{{ t('Itinerary') }}</h2></div><span class="section-count">{{ trip.items.length }} {{ t('activities') }}</span></div>
             <DaySelector v-model="activeDay" :total-days="trip.days" />
             <div class="itinerary">
               <ItineraryItemRow v-for="(item, index) in activeDayItems" :key="item.id" :item="item" :place="placeForItem(item)" :total-days="trip.days" :is-last="index === activeDayItems.length - 1" @remove="removeItem" @move="({ id, direction }) => moveItem(id, direction)" @update="(changes) => updateItem(item.id, changes)" />
-              <p v-if="!activeDayItems.length" class="empty-day">No plans on Day {{ activeDay }} yet. Add a place below.</p>
+              <p v-if="!activeDayItems.length" class="empty-day">{{ t('No plans on Day {day} yet. Add a place below.', { day: activeDay }) }}</p>
             </div>
-            <Button variant="accent" @click="isAdding = !isAdding"><Icon name="plus" :size="16" /> Add Place or Activity</Button>
+            <Button variant="accent" @click="isAdding = !isAdding"><Icon name="plus" :size="16" /> {{ t('Add Place or Activity') }}</Button>
             <div v-if="isAdding" class="add-panel">
-              <input v-model="addSearch" class="add-search" type="search" placeholder="Search destinations..." />
-              <ul class="add-list"><li v-for="destination in addableDestinations" :key="destination.id" :class="{ added: isPlaceInTrip('destination', destination.id) }"><span><strong>{{ destination.name }}</strong><em>{{ destination.country }} · {{ destination.category }}</em></span><button type="button" :disabled="isPlaceInTrip('destination', destination.id)" @click="addFromPanel(destination)"><Icon :name="isPlaceInTrip('destination', destination.id) ? 'check' : 'plus'" :size="14" /> {{ isPlaceInTrip('destination', destination.id) ? 'In Trip' : 'Add' }}</button></li></ul>
+              <input v-model="addSearch" class="add-search" type="search" :placeholder="t('Search destinations...')" />
+              <ul class="add-list"><li v-for="destination in addableDestinations" :key="destination.id" :class="{ added: isPlaceInTrip('destination', destination.id) }"><span><strong>{{ destination.name }}</strong><em>{{ destination.country }} · {{ destination.category }}</em></span><button type="button" :disabled="isPlaceInTrip('destination', destination.id)" @click="addFromPanel(destination)"><Icon :name="isPlaceInTrip('destination', destination.id) ? 'check' : 'plus'" :size="14" /> {{ isPlaceInTrip('destination', destination.id) ? t('In Trip') : t('Add') }}</button></li></ul>
             </div>
           </section>
 
           <section class="planner-section budget-section">
-            <div class="section-heading section-heading-row"><div><p class="eyebrow">Step 3</p><h2>Budget</h2></div><strong class="total-amount">${{ budgetTotal.toFixed(0) }}</strong></div>
-            <form class="expense-form" @submit.prevent="addBudgetExpense"><select v-model="expenseForm.category" aria-label="Expense category"><option>Transportation</option><option>Accommodation</option><option>Food</option><option>Activities</option><option>Other</option></select><input v-model="expenseForm.description" type="text" placeholder="Expense description" aria-label="Expense description" /><input v-model.number="expenseForm.amount" type="number" min="0.01" step="0.01" placeholder="Amount" aria-label="Expense amount" /><button type="submit" class="icon-action" aria-label="Add expense"><Icon name="plus" :size="17" /></button></form>
-            <div v-if="trip.budget.length" class="expense-list"><div v-for="expense in trip.budget" :key="expense.id" class="expense-row"><select :value="expense.category" @change="updateExpense(expense.id, { category: ($event.target as HTMLSelectElement).value as BudgetCategory })"><option>Transportation</option><option>Accommodation</option><option>Food</option><option>Activities</option><option>Other</option></select><input :value="expense.description" aria-label="Edit expense description" @change="updateExpense(expense.id, { description: ($event.target as HTMLInputElement).value })" /><input :value="expense.amount" type="number" min="0" step="0.01" aria-label="Edit expense amount" @change="updateExpense(expense.id, { amount: Number(($event.target as HTMLInputElement).value) || 0 })" /><button type="button" class="icon-action muted" aria-label="Delete expense" @click="removeExpense(expense.id)"><Icon name="trash" :size="16" /></button></div></div>
-            <p v-else class="empty-inline">Add estimated expenses to track your trip total.</p>
+            <div class="section-heading section-heading-row"><div><p class="eyebrow">{{ t('Step 3') }}</p><h2>{{ t('Budget') }}</h2></div><strong class="total-amount">${{ budgetTotal.toFixed(0) }}</strong></div>
+            <form class="expense-form" @submit.prevent="addBudgetExpense"><select v-model="expenseForm.category" :aria-label="t('Expense description')"><option>{{ t('Transportation') }}</option><option>{{ t('Accommodation') }}</option><option>{{ t('Food') }}</option><option>{{ t('Activities') }}</option><option>{{ t('Other') }}</option></select><input v-model="expenseForm.description" type="text" :placeholder="t('Expense description')" :aria-label="t('Expense description')" /><input v-model.number="expenseForm.amount" type="number" min="0.01" step="0.01" :placeholder="t('Amount')" :aria-label="t('Amount')" /><button type="submit" class="icon-action" :aria-label="t('Add')"><Icon name="plus" :size="17" /></button></form>
+            <div v-if="trip.budget.length" class="expense-list"><div v-for="expense in trip.budget" :key="expense.id" class="expense-row"><select :value="expense.category" @change="updateExpense(expense.id, { category: ($event.target as HTMLSelectElement).value as BudgetCategory })"><option>{{ t('Transportation') }}</option><option>{{ t('Accommodation') }}</option><option>{{ t('Food') }}</option><option>{{ t('Activities') }}</option><option>{{ t('Other') }}</option></select><input :value="expense.description" :aria-label="t('Expense description')" @change="updateExpense(expense.id, { description: ($event.target as HTMLInputElement).value })" /><input :value="expense.amount" type="number" min="0" step="0.01" :aria-label="t('Amount')" @change="updateExpense(expense.id, { amount: Number(($event.target as HTMLInputElement).value) || 0 })" /><button type="button" class="icon-action muted" :aria-label="t('Delete')" @click="removeExpense(expense.id)"><Icon name="trash" :size="16" /></button></div></div>
+            <p v-else class="empty-inline">{{ t('Add estimated expenses to track your trip total.') }}</p>
           </section>
 
           <section class="planner-section checklist-section">
-            <div class="section-heading section-heading-row"><div><p class="eyebrow">Step 4</p><h2>Checklist</h2></div><span class="section-count">{{ checklistProgress }} complete</span></div>
-            <form class="checklist-form" @submit.prevent="addChecklist"><input v-model="checklistDraft" type="text" placeholder="Add a checklist item" /><button type="submit" class="icon-action" aria-label="Add checklist item"><Icon name="plus" :size="17" /></button></form>
-            <ul class="checklist"><li v-for="item in trip.checklist" :key="item.id" :class="{ completed: item.completed }"><button type="button" class="check-toggle" :aria-label="item.completed ? 'Mark incomplete' : 'Mark complete'" @click="toggleChecklistItem(item.id)"><Icon :name="item.completed ? 'check' : 'plus'" :size="14" /></button><span>{{ item.label }}</span><button type="button" class="icon-action muted" aria-label="Remove checklist item" @click="removeChecklistItem(item.id)"><Icon name="trash" :size="15" /></button></li></ul>
+            <div class="section-heading section-heading-row"><div><p class="eyebrow">{{ t('Step 4') }}</p><h2>{{ t('Checklist') }}</h2></div><span class="section-count">{{ checklistProgress }} {{ t('complete') }}</span></div>
+            <form class="checklist-form" @submit.prevent="addChecklist"><input v-model="checklistDraft" type="text" :placeholder="t('Add a checklist item')" /><button type="submit" class="icon-action" :aria-label="t('Add')"><Icon name="plus" :size="17" /></button></form>
+            <ul class="checklist"><li v-for="item in trip.checklist" :key="item.id" :class="{ completed: item.completed }"><button type="button" class="check-toggle" :aria-label="item.completed ? t('Close') : t('Add')" @click="toggleChecklistItem(item.id)"><Icon :name="item.completed ? 'check' : 'plus'" :size="14" /></button><span>{{ item.label }}</span><button type="button" class="icon-action muted" :aria-label="t('Delete')" @click="removeChecklistItem(item.id)"><Icon name="trash" :size="15" /></button></li></ul>
           </section>
         </main>
 
-        <aside class="planner-sidebar"><TripSummary class="planner-summary" :summary="summary" /><section class="summary-card"><p class="eyebrow">Your trip</p><h2>{{ trip.name }}</h2><p>{{ trip.destination || 'Choose a destination above' }}</p><div class="summary-stats"><span><strong>{{ trip.days }}</strong> days</span><span><strong>{{ trip.items.length }}</strong> activities</span><span><strong>${{ budgetTotal.toFixed(0) }}</strong> budget</span><span><strong>{{ checklistProgress }}</strong> checklist</span></div></section><div class="sidebar-actions"><Button class="route-button" to="/map" variant="outline"><Icon name="route" :size="16" /> View Route</Button><Button class="trips-button" to="/trips" variant="outline"><Icon name="calendar" :size="16" /> My Trips</Button></div></aside>
+        <aside class="planner-sidebar"><TripSummary class="planner-summary" :summary="summary" /><section class="summary-card"><p class="eyebrow">{{ t('Your trip') }}</p><h2>{{ trip.name }}</h2><p>{{ trip.destination || t('Choose a destination above') }}</p><div class="summary-stats"><span><strong>{{ trip.days }}</strong> {{ t('days') }}</span><span><strong>{{ trip.items.length }}</strong> {{ t('activities') }}</span><span><strong>${{ budgetTotal.toFixed(0) }}</strong> {{ t('budget') }}</span><span><strong>{{ checklistProgress }}</strong> {{ t('Checklist') }}</span></div></section><div class="sidebar-actions"><Button class="route-button" to="/map" variant="outline"><Icon name="route" :size="16" /> {{ t('View Route') }}</Button><Button class="trips-button" to="/trips" variant="outline"><Icon name="calendar" :size="16" /> {{ t('My Trips') }}</Button></div></aside>
       </div>
     </div>
   </div>

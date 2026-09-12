@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t } from '../../composables/useLanguage'
+
 defineProps<{
   links: { label: string; to: string }[]
   open: boolean
@@ -18,7 +20,7 @@ defineEmits<{
       class="mobile-link"
       @click="$emit('close')"
     >
-      {{ link.label }}
+      {{ t(link.label) }}
     </router-link>
 
     <slot name="extra" />

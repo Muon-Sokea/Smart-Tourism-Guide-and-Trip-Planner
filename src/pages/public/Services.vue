@@ -1,48 +1,50 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import Icon from '../../components/common/Icon.vue'
+import { t } from '../../composables/useLanguage'
 
-const services = [
+const services = computed(() => [
   {
-    title: 'Travel Discovery',
-    description: 'Browse a curated set of destinations from every corner of the world, sorted by category.',
+    title: t('Travel Discovery'),
+    description: t('Browse a curated set of destinations from every corner of the world, sorted by category.'),
     icon: 'compass',
   },
   {
-    title: 'Trip Planning',
-    description: 'Build a simple day-by-day itinerary and keep every stop organized by day and time.',
+    title: t('Trip Planning'),
+    description: t('Build a simple day-by-day itinerary and keep every stop organized by day and time.'),
     icon: 'route',
   },
   {
-    title: 'Smart Explore',
-    description: 'Search and filter destinations by name, country, category, or rating in a few clicks.',
+    title: t('Smart Explore'),
+    description: t('Search and filter destinations by name, country, category, or rating in a few clicks.'),
     icon: 'map',
   },
   {
-    title: 'Save Favorites',
-    description: 'Keep a personal shortlist of places you want to visit, ready whenever you need it.',
+    title: t('Save Favorites'),
+    description: t('Keep a personal shortlist of places you want to visit, ready whenever you need it.'),
     icon: 'heart',
   },
-]
+])
 </script>
 
 <template>
   <div class="service">
     <div class="container">
       <header class="page-header">
-        <p class="eyebrow">A simpler way to travel</p>
-        <h1>Our Services</h1>
-        <p>Everything TravelGo offers to help you discover, organize, and remember your next trip.</p>
+        <p class="eyebrow">{{ t('A simpler way to travel') }}</p>
+        <h1>{{ t('Our Services') }}</h1>
+        <p>{{ t('Everything TravelGo offers to help you discover, organize, and remember your next trip.') }}</p>
       </header>
 
       <section class="service-intro">
         <div>
-          <p class="eyebrow">TravelGo at a glance</p>
-          <h2>From first idea to a clearer plan</h2>
+          <p class="eyebrow">{{ t('TravelGo at a glance') }}</p>
+          <h2>{{ t('From first idea to a clearer plan') }}</h2>
         </div>
-        <p>Use one focused workspace to find inspiration, compare possibilities, and keep the places you love close.</p>
+        <p>{{ t('Use one focused workspace to find inspiration, compare possibilities, and keep the places you love close.') }}</p>
       </section>
 
-      <section class="service-grid" aria-label="TravelGo services">
+      <section class="service-grid" :aria-label="t('TravelGo services')">
         <article v-for="(service, index) in services" :key="service.title" class="service-card">
           <span class="service-index">0{{ index + 1 }}</span>
           <span class="service-icon"><Icon :name="service.icon" :size="22" /></span>
@@ -55,7 +57,7 @@ const services = [
 
       <div class="service-footer-note">
         <Icon name="arrow-right" :size="18" />
-        <span>Start with Explore and build your journey at your own pace.</span>
+        <span>{{ t('Start with Explore and build your journey at your own pace.') }}</span>
       </div>
     </div>
   </div>

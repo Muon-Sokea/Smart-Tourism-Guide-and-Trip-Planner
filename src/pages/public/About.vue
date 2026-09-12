@@ -1,54 +1,54 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import Icon from '../../components/common/Icon.vue'
+import { t } from '../../composables/useLanguage'
 
-const goals = [
-  { title: 'Simple discovery', text: 'Find places worth visiting without digging through cluttered travel pages.', icon: 'compass' },
-  { title: 'Useful context', text: 'Compare ratings, categories, timing, cost, and highlights before you plan.', icon: 'map' },
-  { title: 'Clear planning', text: 'Move naturally from an inspiring idea to a trip you can organize.', icon: 'route' },
-]
+const goals = computed(() => [
+  { title: t('Simple discovery'), text: t('Find places worth visiting without digging through cluttered travel pages.'), icon: 'compass' },
+  { title: t('Useful context'), text: t('Compare ratings, categories, timing, cost, and highlights before you plan.'), icon: 'map' },
+  { title: t('Clear planning'), text: t('Move naturally from an inspiring idea to a trip you can organize.'), icon: 'route' },
+])
 
-const highlights = [
-  'Curated destinations from around the world',
-  'Searchable categories and practical travel details',
-  'A calm workspace for building your next journey',
-]
+const highlights = computed(() => [
+  t('Curated destinations from around the world'),
+  t('Searchable categories and practical travel details'),
+  t('A calm workspace for building your next journey'),
+])
 </script>
 
 <template>
   <div class="about">
     <div class="container">
       <header class="about-hero">
-        <p class="eyebrow">Your travel companion</p>
-        <h1>About TravelGo</h1>
+        <p class="eyebrow">{{ t('Your travel companion') }}</p>
+        <h1>{{ t('About TravelGo') }}</h1>
         <p class="intro">
-          TravelGo is a simple tourism discovery platform designed to help you explore interesting destinations,
-          collect inspiration, and shape it into a journey that feels like yours.
+          {{ t('TravelGo is a simple tourism discovery platform designed to help you explore interesting destinations, collect inspiration, and shape it into a journey that feels like yours.') }}
         </p>
       </header>
 
       <section class="mission-panel">
         <div>
-          <p class="eyebrow">Who we are</p>
-          <h2>Travel planning, made more human.</h2>
+          <p class="eyebrow">{{ t('Who we are') }}</p>
+          <h2>{{ t('Travel planning, made more human.') }}</h2>
         </div>
         <p class="section-copy">
-          We bring discovery and planning into one focused place. TravelGo keeps the first step of a trip enjoyable
-          while giving every destination enough detail to make the next step feel easy.
+          {{ t('We bring discovery and planning into one focused place. TravelGo keeps the first step of a trip enjoyable while giving every destination enough detail to make the next step feel easy.') }}
         </p>
       </section>
 
       <section class="mission-panel">
         <div>
-          <p class="eyebrow">Our mission</p>
-          <h2>Make every journey easier to begin.</h2>
+          <p class="eyebrow">{{ t('Our mission') }}</p>
+          <h2>{{ t('Make every journey easier to begin.') }}</h2>
         </div>
-        <p>From a quick search to a day-by-day plan, TravelGo helps turn curiosity into a clear, personal travel idea.</p>
+        <p>{{ t('From a quick search to a day-by-day plan, TravelGo helps turn curiosity into a clear, personal travel idea.') }}</p>
       </section>
 
       <section class="about-section">
         <div class="section-heading">
-          <p class="eyebrow">Why choose TravelGo</p>
-          <h2>Designed around the way people explore</h2>
+          <p class="eyebrow">{{ t('Why choose TravelGo') }}</p>
+          <h2>{{ t('Designed around the way people explore') }}</h2>
         </div>
         <div class="goal-grid">
           <article v-for="goal in goals" :key="goal.title" class="goal-card">
@@ -61,8 +61,8 @@ const highlights = [
 
       <section class="highlights-section">
         <div>
-          <p class="eyebrow">TravelGo highlights</p>
-          <h2>Everything you need for a confident first step</h2>
+          <p class="eyebrow">{{ t('TravelGo highlights') }}</p>
+          <h2>{{ t('Everything you need for a confident first step') }}</h2>
         </div>
         <ul class="highlight-list">
           <li v-for="highlight in highlights" :key="highlight">

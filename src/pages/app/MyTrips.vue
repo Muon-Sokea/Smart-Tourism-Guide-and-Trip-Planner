@@ -8,6 +8,7 @@ import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 import type { Trip } from '../../types/trip'
 import type { Booking } from '../../types/booking'
+import { t, dateLocale } from '../../composables/useLanguage'
 
 const router = useRouter()
 const { upcomingTrips, pastTrips, tripById, deleteTrip } = useMyTrips()
@@ -91,21 +92,21 @@ function tripBudgetTotal(tripData: Trip): number {
 
 function formatDate(dateStr: string): string {
   if (!dateStr) return '—'
-  return new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${dateStr}T00:00:00`))
+  return new Intl.DateTimeFormat(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${dateStr}T00:00:00`))
 }
 
 function tripStatus(tripData: Trip): string {
   const today = new Date().toISOString().slice(0, 10)
-  if (!tripData.startDate) return 'Planned'
-  if (tripData.endDate && tripData.endDate < today) return 'Completed'
-  if (tripData.startDate > today) return 'Upcoming'
-  return 'In Progress'
+  if (!tripData.startDate) return t('Planned')
+  if (tripData.endDate && tripData.endDate < today) return t('Completed')
+  if (tripData.startDate > today) return t('Upcoming')
+  return t('In Progress')
 }
 
 function statusClass(tripData: Trip): string {
   const status = tripStatus(tripData)
-  if (status === 'Completed') return 'status-completed'
-  if (status === 'In Progress') return 'status-active'
+  if (status === t('Completed')) return 'status-completed'
+  if (status === t('In Progress')) return 'status-active'
   return 'status-upcoming'
 }
 
@@ -125,59 +126,59 @@ function destCountry(destination: string): string {
       <!-- Trip Details View -->
       <template v-if="selectedTrip">
         <div class="detail-header">
-          <button type="button" class="back-btn" @click="backToList"><Icon name="arrow-left" :size="16" /> Back to My Trips</button>
+          <button type="button" class="back-btn" @click="backToList"><Icon name="arrow-left" :size="16" /> {{ t('Back to My Trips') }}</button>
           <div class="detail-actions">
-            <Button variant="outline" @click="editTrip(selectedTrip!)"><Icon name="edit" :size="15" /> Edit Trip</Button>
-            <Button variant="accent" :disabled="!selectedTrip!.items.length" @click="viewRoute(selectedTrip!)"><Icon name="route" :size="15" /> View Route</Button>
+            <Button variant="outline" @click="editTrip(selectedTrip!)"><Icon name="edit" :size="15" /> {{ t('Edit Trip') }}</Button>
+            <Button variant="accent" :disabled="!selectedTrip!.items.length" @click="viewRoute(selectedTrip!)"><Icon name="route" :size="15" /> {{ t('View Route') }}</Button>
           </div>
         </div>
 
         <header class="detail-hero">
           <div>
-            <p class="eyebrow">Trip Details</p>
+            <p class="eyebrow">{{ t('Trip Details') }}</p>
             <h1>{{ selectedTrip.name }}</h1>
-            <p class="detail-subtitle">{{ selectedTrip.destination || 'No destination set' }}</p>
+            <p class="detail-subtitle">{{ selectedTrip.destination || t('No destination set') }}</p>
           </div>
           <span class="status-badge" :class="statusClass(selectedTrip)">{{ tripStatus(selectedTrip) }}</span>
         </header>
 
         <!-- Trip Overview -->
         <section class="detail-section overview-card">
-          <h2>Trip Overview</h2>
+          <h2>{{ t('Trip Overview') }}</h2>
           <div class="overview-grid">
-            <div class="overview-item"><Icon name="calendar" :size="18" /><div><span class="overview-label">Dates</span><strong>{{ formatDate(selectedTrip.startDate) }} — {{ formatDate(selectedTrip.endDate) }}</strong></div></div>
-            <div class="overview-item"><Icon name="clock" :size="18" /><div><span class="overview-label">Duration</span><strong>{{ selectedTrip.days }} days</strong></div></div>
-            <div class="overview-item"><Icon name="map-pin" :size="18" /><div><span class="overview-label">Places</span><strong>{{ selectedTrip.items.length }} activities</strong></div></div>
-            <div class="overview-item"><Icon name="compass" :size="18" /><div><span class="overview-label">Budget</span><strong>${{ tripBudgetTotal(selectedTrip).toFixed(0) }}</strong></div></div>
+            <div class="overview-item"><Icon name="calendar" :size="18" /><div><span class="overview-label">{{ t('Dates') }}</span><strong>{{ formatDate(selectedTrip.startDate) }} — {{ formatDate(selectedTrip.endDate) }}</strong></div></div>
+            <div class="overview-item"><Icon name="clock" :size="18" /><div><span class="overview-label">{{ t('Duration') }}</span><strong>{{ selectedTrip.days }} {{ t('days') }}</strong></div></div>
+            <div class="overview-item"><Icon name="map-pin" :size="18" /><div><span class="overview-label">{{ t('Places') }}</span><strong>{{ selectedTrip.items.length }} {{ t('activities') }}</strong></div></div>
+            <div class="overview-item"><Icon name="compass" :size="18" /><div><span class="overview-label">{{ t('Budget') }}</span><strong>${{ tripBudgetTotal(selectedTrip).toFixed(0) }}</strong></div></div>
           </div>
         </section>
 
         <!-- Itinerary -->
         <section class="detail-section" v-if="selectedTrip.items.length">
-          <h2>Itinerary</h2>
+          <h2>{{ t('Itinerary') }}</h2>
           <div class="itinerary-timeline">
             <div v-for="day in selectedTrip.days" :key="day" class="day-group">
-              <h3 class="day-label">Day {{ day }}</h3>
+              <h3 class="day-label">{{ t('Day {day}', { day }) }}</h3>
               <div v-if="selectedTrip.items.filter(i => i.day === day).length" class="day-items">
                 <div v-for="item in selectedTrip.items.filter(i => i.day === day).sort((a, b) => a.time.localeCompare(b.time))" :key="item.id" class="itinerary-item">
                   <span class="item-time">{{ item.time }}</span>
                   <div class="item-details">
-                    <strong>{{ placeForItem(item)?.name ?? 'Unknown place' }}</strong>
+                    <strong>{{ placeForItem(item)?.name ?? t('Unknown place') }}</strong>
                     <span>{{ placeForItem(item)?.country ?? '' }}{{ placeForItem(item) ? ' · ' : '' }}{{ item.durationLabel }}</span>
                   </div>
                 </div>
               </div>
-              <p v-else class="no-items">No activities planned</p>
+              <p v-else class="no-items">{{ t('No activities planned') }}</p>
             </div>
           </div>
         </section>
 
         <!-- Budget -->
         <section class="detail-section" v-if="selectedTrip.budget.length">
-          <h2>Budget</h2>
+          <h2>{{ t('Budget') }}</h2>
           <div class="budget-summary">
             <span class="budget-total">${{ tripBudgetTotal(selectedTrip).toFixed(2) }}</span>
-            <span class="budget-count">{{ selectedTrip.budget.length }} expenses</span>
+            <span class="budget-count">{{ selectedTrip.budget.length }} {{ t('expenses') }}</span>
           </div>
           <div class="budget-list">
             <div v-for="expense in selectedTrip.budget" :key="expense.id" class="budget-row">
@@ -190,9 +191,9 @@ function destCountry(destination: string): string {
 
         <!-- Checklist -->
         <section class="detail-section" v-if="selectedTrip.checklist.length">
-          <h2>Checklist</h2>
+          <h2>{{ t('Checklist') }}</h2>
           <div class="checklist-summary">
-            {{ selectedTrip.checklist.filter(c => c.completed).length }} / {{ selectedTrip.checklist.length }} complete
+            {{ selectedTrip.checklist.filter(c => c.completed).length }} / {{ selectedTrip.checklist.length }} {{ t('complete') }}
           </div>
           <ul class="checklist-detail">
             <li v-for="item in selectedTrip.checklist" :key="item.id" :class="{ done: item.completed }">
@@ -204,7 +205,7 @@ function destCountry(destination: string): string {
 
         <!-- Booked Services -->
         <section class="detail-section" v-if="tripBookings(selectedTrip.id).length">
-          <h2>Booked Services</h2>
+          <h2>{{ t('Booked Services') }}</h2>
           <div class="bookings-list">
             <div v-for="booking in tripBookings(selectedTrip.id)" :key="booking.id" class="booking-row">
               <div class="booking-info">
@@ -213,7 +214,7 @@ function destCountry(destination: string): string {
               </div>
               <div class="booking-meta">
                 <span class="booking-price">${{ booking.totalPrice }}</span>
-                <span class="booking-status" :class="`status-${booking.status.toLowerCase()}`">{{ booking.status }}</span>
+                <span class="booking-status" :class="`status-${booking.status.toLowerCase()}`">{{ t(booking.status) }}</span>
               </div>
             </div>
           </div>
@@ -224,24 +225,24 @@ function destCountry(destination: string): string {
       <template v-else>
         <header class="page-header">
           <div>
-            <p class="eyebrow">Your journeys</p>
-            <h1>My Trips</h1>
-            <p class="page-subtitle">Manage your saved trips and continue planning your journey.</p>
+            <p class="eyebrow">{{ t('Your journeys') }}</p>
+            <h1>{{ t('My Trips') }}</h1>
+            <p class="page-subtitle">{{ t('Manage your saved trips and continue planning your journey.') }}</p>
           </div>
-          <Button to="/trip-planner" variant="accent"><Icon name="plus" :size="16" /> Create New Trip</Button>
+          <Button to="/trip-planner" variant="accent"><Icon name="plus" :size="16" /> {{ t('Create New Trip') }}</Button>
         </header>
 
         <!-- Empty State -->
         <div v-if="!upcomingTrips.length && !pastTrips.length" class="empty-state">
           <Icon name="compass" :size="40" />
-          <h2>No trips yet</h2>
-          <p>Start planning your next journey with TravelGo.</p>
-          <Button to="/trip-planner" variant="accent"><Icon name="plus" :size="16" /> Create Your First Trip</Button>
+          <h2>{{ t('No trips yet') }}</h2>
+          <p>{{ t('Start planning your next journey with TravelGo.') }}</p>
+          <Button to="/trip-planner" variant="accent"><Icon name="plus" :size="16" /> {{ t('Create Your First Trip') }}</Button>
         </div>
 
         <!-- Upcoming Trips -->
         <section v-if="upcomingTrips.length" class="trips-section">
-          <h2>Upcoming Trips</h2>
+          <h2>{{ t('Upcoming Trips') }}</h2>
           <div class="trips-grid">
             <div v-for="tripItem in upcomingTrips" :key="tripItem.id" class="trip-card">
               <div class="card-top">
@@ -253,18 +254,18 @@ function destCountry(destination: string): string {
               </div>
               <div class="card-stats">
                 <span><Icon name="calendar" :size="14" /> {{ formatDate(tripItem.startDate) }} — {{ formatDate(tripItem.endDate) }}</span>
-                <span><Icon name="clock" :size="14" /> {{ tripItem.days }} days</span>
-                <span><Icon name="map-pin" :size="14" /> {{ tripItem.items.length }} places</span>
+                <span><Icon name="clock" :size="14" /> {{ tripItem.days }} {{ t('days') }}</span>
+                <span><Icon name="map-pin" :size="14" /> {{ tripItem.items.length }} {{ t('places') }}</span>
                 <span><Icon name="compass" :size="14" /> ${{ tripBudgetTotal(tripItem).toFixed(0) }}</span>
               </div>
               <div class="card-actions">
-                <Button variant="primary" @click="viewTrip(tripItem.id)">View Trip</Button>
-                <Button variant="outline" @click="editTrip(tripItem)"><Icon name="edit" :size="14" /> Edit</Button>
-                <button v-if="confirmDeleteId !== tripItem.id" type="button" class="delete-btn" @click="confirmDelete(tripItem.id)"><Icon name="trash" :size="14" /> Delete</button>
+                <Button variant="primary" @click="viewTrip(tripItem.id)">{{ t('View Trip') }}</Button>
+                <Button variant="outline" @click="editTrip(tripItem)"><Icon name="edit" :size="14" /> {{ t('Edit') }}</Button>
+                <button v-if="confirmDeleteId !== tripItem.id" type="button" class="delete-btn" @click="confirmDelete(tripItem.id)"><Icon name="trash" :size="14" /> {{ t('Delete') }}</button>
                 <div v-else class="confirm-delete">
-                  <span>Delete?</span>
-                  <button type="button" class="confirm-yes" @click="executeDelete">Yes</button>
-                  <button type="button" class="confirm-no" @click="cancelDelete">No</button>
+                  <span>{{ t('Delete?') }}</span>
+                  <button type="button" class="confirm-yes" @click="executeDelete">{{ t('Yes') }}</button>
+                  <button type="button" class="confirm-no" @click="cancelDelete">{{ t('No') }}</button>
                 </div>
               </div>
             </div>
@@ -273,22 +274,22 @@ function destCountry(destination: string): string {
 
         <!-- Past Trips -->
         <section v-if="pastTrips.length" class="trips-section">
-          <h2>Past Trips</h2>
+          <h2>{{ t('Past Trips') }}</h2>
           <div class="trips-grid past">
             <div v-for="tripItem in pastTrips" :key="tripItem.id" class="trip-card compact">
               <div class="card-top">
                 <div class="card-header">
                   <h3>{{ tripItem.name }}</h3>
-                  <span class="status-badge status-completed">Completed</span>
+                  <span class="status-badge status-completed">{{ t('Completed') }}</span>
                 </div>
                 <p class="card-destination">{{ destName(tripItem.destination) }}<span v-if="destCountry(tripItem.destination)">, {{ destCountry(tripItem.destination) }}</span></p>
               </div>
               <div class="card-stats">
                 <span><Icon name="calendar" :size="14" /> {{ formatDate(tripItem.startDate) }} — {{ formatDate(tripItem.endDate) }}</span>
-                <span><Icon name="map-pin" :size="14" /> {{ tripItem.items.length }} places</span>
+                <span><Icon name="map-pin" :size="14" /> {{ tripItem.items.length }} {{ t('places') }}</span>
               </div>
               <div class="card-actions">
-                <Button variant="outline" @click="viewTrip(tripItem.id)">View Trip</Button>
+                <Button variant="outline" @click="viewTrip(tripItem.id)">{{ t('View Trip') }}</Button>
               </div>
             </div>
           </div>
@@ -331,7 +332,9 @@ h2 { color: var(--color-primary); margin: 0 0 1rem; }
 .card-stats { display: flex; flex-wrap: wrap; gap: 0.65rem 1.25rem; color: var(--color-muted); font-size: var(--fs-small); }
 .card-stats span { display: inline-flex; align-items: center; gap: 0.3rem; }
 
-.card-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; padding-top: 0.5rem; border-top: 1px solid rgba(var(--color-primary-rgb), 0.08); }
+.card-actions { display: flex; gap: 0.5rem; align-items: center; padding-top: 0.5rem; border-top: 1px solid rgba(var(--color-primary-rgb), 0.08); }
+.card-actions :deep(.btn) { flex: 1; padding: 0.5rem 0.8rem; }
+.card-actions .delete-btn { flex: 1; justify-content: center; }
 
 /* Status Badges */
 .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: var(--fs-small); font-weight: 600; white-space: nowrap; }

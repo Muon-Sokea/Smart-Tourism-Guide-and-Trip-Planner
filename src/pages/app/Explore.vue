@@ -12,15 +12,16 @@ import { hotels } from '../../data/hotels'
 import { restaurants } from '../../data/restaurants'
 import { activities } from '../../data/activities'
 import type { ExploreContent } from '../../types/explore'
+import { t } from '../../composables/useLanguage'
 
 const route = useRoute()
 
 const categories = [
-  { label: 'All', value: 'all', icon: 'compass' },
-  { label: 'Destinations', value: 'destinations', icon: 'landmark' },
-  { label: 'Hotels', value: 'hotels', icon: 'building' },
-  { label: 'Restaurants', value: 'restaurants', icon: 'utensils' },
-  { label: 'Activities', value: 'activities', icon: 'flag' },
+  { label: t('All'), value: 'all', icon: 'compass' },
+  { label: t('Destinations'), value: 'destinations', icon: 'landmark' },
+  { label: t('Hotels'), value: 'hotels', icon: 'building' },
+  { label: t('Restaurants'), value: 'restaurants', icon: 'utensils' },
+  { label: t('Activities'), value: 'activities', icon: 'flag' },
 ] as const
 
 const contentItems = [...hotels, ...restaurants, ...activities]
@@ -33,16 +34,16 @@ const locations = Array.from(
 ).sort()
 
 const ratingOptions = [
-  { label: 'All Ratings', value: 0 },
+  { label: t('All Ratings'), value: 0 },
   { label: '4.5+', value: 4.5 },
   { label: '4.7+', value: 4.7 },
   { label: '4.9+', value: 4.9 },
 ]
 
 const sortOptions = [
-  { label: 'Popular', value: 'popular' },
-  { label: 'Rating', value: 'rating' },
-  { label: 'Price', value: 'price' },
+  { label: t('Popular'), value: 'popular' },
+  { label: t('Rating'), value: 'rating' },
+  { label: t('Price'), value: 'price' },
 ] as const
 
 const searchQuery = ref(typeof route.query.search === 'string' ? route.query.search : '')
@@ -211,19 +212,19 @@ function clearFilters() {
   <div class="explore">
     <div class="container">
       <header class="explore-header">
-        <p class="eyebrow">Discover more of the world</p>
-        <h1>Explore TravelGo</h1>
-        <p>Find destinations, stays, food, and experiences for your next journey.</p>
+        <p class="eyebrow">{{ t('Discover more of the world') }}</p>
+        <h1>{{ t('Explore TravelGo') }}</h1>
+        <p>{{ t('Find destinations, stays, food, and experiences for your next journey.') }}</p>
       </header>
 
       <div class="explore-controls">
         <SearchBar
           v-model="searchQuery"
           size="large"
-          placeholder="Search destinations, hotels, food, or activities..."
+          :placeholder="t('Search destinations, hotels, food, or activities...')"
         />
 
-        <nav class="category-nav" aria-label="Explore categories">
+        <nav class="category-nav" :aria-label="t('Explore categories')">
           <button
             v-for="category in categories"
             :key="category.value"
@@ -244,15 +245,15 @@ function clearFilters() {
           @click="isFiltersOpen = !isFiltersOpen"
         >
           <Icon name="filter" :size="16" />
-          Filters
+          {{ t('Filters') }}
           <Icon name="chevron-down" :size="16" />
         </button>
 
         <div class="filter-panel" :class="{ open: isFiltersOpen }">
           <div class="filter-group">
-            <label for="location-filter">Location</label>
+            <label for="location-filter">{{ t('Location') }}</label>
             <select id="location-filter" v-model="selectedLocation">
-              <option value="All">All locations</option>
+              <option value="All">{{ t('All locations') }}</option>
               <option v-for="location in locations" :key="location" :value="location">
                 {{ location }}
               </option>
@@ -260,9 +261,9 @@ function clearFilters() {
           </div>
 
           <div class="filter-group">
-            <label for="type-filter">Destination type</label>
+            <label for="type-filter">{{ t('Destination type') }}</label>
             <select id="type-filter" v-model="destinationCategory">
-              <option value="All">All types</option>
+              <option value="All">{{ t('All types') }}</option>
               <option v-for="category in destinationCategories" :key="category" :value="category">
                 {{ category }}
               </option>
@@ -270,7 +271,7 @@ function clearFilters() {
           </div>
 
           <div class="filter-group">
-            <label for="rating-filter">Rating</label>
+            <label for="rating-filter">{{ t('Rating') }}</label>
             <select id="rating-filter" v-model.number="minRating">
               <option v-for="option in ratingOptions" :key="option.label" :value="option.value">
                 {{ option.label }}
@@ -279,17 +280,17 @@ function clearFilters() {
           </div>
 
           <div class="filter-group">
-            <label for="price-filter">Price</label>
+            <label for="price-filter">{{ t('Price') }}</label>
             <select id="price-filter" v-model="selectedPrice">
-              <option value="all">All prices</option>
-              <option value="budget">Budget</option>
-              <option value="standard">Standard</option>
-              <option value="premium">Premium</option>
+              <option value="all">{{ t('All prices') }}</option>
+              <option value="budget">{{ t('Budget') }}</option>
+              <option value="standard">{{ t('Standard') }}</option>
+              <option value="premium">{{ t('Premium') }}</option>
             </select>
           </div>
 
           <div class="filter-group">
-            <label for="sort-filter">Sort by</label>
+            <label for="sort-filter">{{ t('Sort by') }}</label>
             <select id="sort-filter" v-model="sortBy">
               <option v-for="option in sortOptions" :key="option.value" :value="option.value">
                 {{ option.label }}
@@ -302,10 +303,10 @@ function clearFilters() {
       <section v-if="isDefaultBrowse" class="featured-section">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Popular right now</p>
-            <h2>Featured Destinations</h2>
+            <p class="eyebrow">{{ t('Popular right now') }}</p>
+            <h2>{{ t('Featured Destinations') }}</h2>
           </div>
-          <span class="result-count">{{ featuredDestinations.length }} highlights</span>
+          <span class="result-count">{{ featuredDestinations.length }} {{ t('highlights') }}</span>
         </div>
         <DestinationGrid :destinations="featuredDestinations" />
       </section>
@@ -313,15 +314,15 @@ function clearFilters() {
       <section class="results-section">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Explore more</p>
-            <h2>{{ selectedCategory === 'all' ? 'All Travel Finds' : categories.find((category) => category.value === selectedCategory)?.label }}</h2>
+            <p class="eyebrow">{{ t('Explore more') }}</p>
+            <h2>{{ selectedCategory === 'all' ? t('All Travel Finds') : categories.find((category) => category.value === selectedCategory)?.label }}</h2>
           </div>
-          <span v-if="hasResults" class="result-count">{{ exploreMoreDestinations.length + exploreMoreContent.length }} results</span>
+          <span v-if="hasResults" class="result-count">{{ exploreMoreDestinations.length + exploreMoreContent.length }} {{ t('results') }}</span>
         </div>
 
         <DestinationGrid v-if="exploreMoreDestinations.length" :destinations="exploreMoreDestinations">
           <template #empty-action>
-            <Button variant="accent" @click="clearFilters">Clear Filters</Button>
+            <Button variant="accent" @click="clearFilters">{{ t('Clear Filters') }}</Button>
           </template>
         </DestinationGrid>
 
@@ -329,16 +330,16 @@ function clearFilters() {
           <ExploreContentCard v-for="item in exploreMoreContent" :key="item.id" :item="item" />
         </div>
 
-        <EmptyState v-if="!hasResults" message="No travel finds match your search.">
-          <Button variant="accent" @click="clearFilters">Clear Filters</Button>
+        <EmptyState v-if="!hasResults" :message="t('No travel finds match your search.')">
+          <Button variant="accent" @click="clearFilters">{{ t('Clear Filters') }}</Button>
         </EmptyState>
       </section>
 
       <section v-if="isDefaultBrowse" class="featured-section content-featured">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Stay, taste, do</p>
-            <h2>More to Discover</h2>
+            <p class="eyebrow">{{ t('Stay, taste, do') }}</p>
+            <h2>{{ t('More to Discover') }}</h2>
           </div>
         </div>
         <div class="content-grid">

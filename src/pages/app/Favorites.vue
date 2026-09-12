@@ -7,6 +7,7 @@ import DestinationGrid from '../../components/explore/DestinationGrid.vue'
 import ExploreContentCard from '../../components/explore/ExploreContentCard.vue'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
+import { t } from '../../composables/useLanguage'
 
 const { favoriteIds } = useFavorites()
 
@@ -27,22 +28,22 @@ const totalFavorites = computed(() => favoriteDestinations.value.length + favori
   <div class="favorites">
     <div class="container">
       <header class="page-header">
-        <h1>My Favorites</h1>
-        <p>Keep the places you want to visit close at hand.</p>
+        <h1>{{ t('My Favorites') }}</h1>
+        <p>{{ t('Keep the places you want to visit close at hand.') }}</p>
         <span class="favorite-count">
           {{ totalFavorites }}
-          {{ totalFavorites === 1 ? 'place saved' : 'places saved' }}
+          {{ totalFavorites === 1 ? t('place saved') : t('places saved') }}
         </span>
       </header>
 
       <template v-if="totalFavorites">
         <section v-if="favoriteDestinations.length">
-          <h2 class="section-title">Destinations</h2>
+          <h2 class="section-title">{{ t('Destinations') }}</h2>
           <DestinationGrid :destinations="favoriteDestinations" />
         </section>
 
         <section v-if="favoriteServices.length">
-          <h2 class="section-title">Stays, Food &amp; Activities</h2>
+          <h2 class="section-title">{{ t('Stays, Food & Activities') }}</h2>
           <div class="services-grid">
             <ExploreContentCard v-for="item in favoriteServices" :key="item.id" :item="item" />
           </div>
@@ -51,11 +52,11 @@ const totalFavorites = computed(() => favoriteDestinations.value.length + favori
 
       <div v-else class="empty-favorites">
         <Icon name="heart" :size="40" />
-        <p class="empty-title">No favorites yet.</p>
+        <p class="empty-title">{{ t('No favorites yet.') }}</p>
         <p class="empty-subtitle">
-          Explore destinations, hotels, restaurants, and activities and save the ones you'd love to visit.
+          {{ t("Explore destinations, hotels, restaurants, and activities and save the ones you'd love to visit.") }}
         </p>
-        <Button to="/explore" variant="accent">Explore TravelGo</Button>
+        <Button to="/explore" variant="accent">{{ t('Explore TravelGo') }}</Button>
       </div>
     </div>
   </div>

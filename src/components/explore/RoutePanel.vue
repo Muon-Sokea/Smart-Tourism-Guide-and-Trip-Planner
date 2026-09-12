@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { MapRouteStop } from '../../types/route'
+import { t } from '../../composables/useLanguage'
 
 const props = defineProps<{
   stops: MapRouteStop[]
@@ -42,19 +43,19 @@ const segments = computed(() => props.stops.slice(1).map((stop, index) => {
 </script>
 
 <template>
-  <aside class="route-panel" aria-label="Route information">
+  <aside class="route-panel" :aria-label="t('Route information')">
     <section class="route-summary">
-      <p class="eyebrow">Route summary</p>
+      <p class="eyebrow">{{ t('Route summary') }}</p>
       <div class="summary-grid">
-        <div><strong>{{ stops.length }}</strong><span>Places</span></div>
-        <div><strong>{{ stops.length ? stops[stops.length - 1].day : 0 }}</strong><span>Days</span></div>
-        <div><strong>{{ distanceKm.toLocaleString(undefined, { maximumFractionDigits: 1 }) }} km</strong><span>Estimated distance</span></div>
-        <div><strong>{{ formatDuration(travelHours) }}</strong><span>Estimated travel time</span></div>
+        <div><strong>{{ stops.length }}</strong><span>{{ t('Places') }}</span></div>
+        <div><strong>{{ stops.length ? stops[stops.length - 1].day : 0 }}</strong><span>{{ t('Days') }}</span></div>
+        <div><strong>{{ distanceKm.toLocaleString(undefined, { maximumFractionDigits: 1 }) }} km</strong><span>{{ t('Estimated distance') }}</span></div>
+        <div><strong>{{ formatDuration(travelHours) }}</strong><span>{{ t('Estimated travel time') }}</span></div>
       </div>
     </section>
 
     <section class="route-sequence">
-      <div class="panel-heading"><p class="eyebrow">Your route</p><span>{{ stops.length }} stops</span></div>
+      <div class="panel-heading"><p class="eyebrow">{{ t('Your route') }}</p><span>{{ stops.length }} {{ t('stops') }}</span></div>
       <ol>
         <li v-for="(stop, index) in stops" :key="stop.id" :class="{ selected: index === selectedIndex }">
           <button type="button" @click="$emit('select', index)">

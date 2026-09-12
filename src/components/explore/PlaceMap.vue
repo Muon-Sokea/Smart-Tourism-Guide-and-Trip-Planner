@@ -3,6 +3,7 @@ import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { GeocodeResult } from '../../utils/geocode'
+import { t } from '../../composables/useLanguage'
 
 const props = defineProps<{
   /** Real coordinates for the place being shown. */
@@ -107,7 +108,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="place-map" aria-label="Service location map">
+  <div class="place-map" :aria-label="t('Service location map')">
     <div ref="mapElement" class="map-canvas"></div>
     <button type="button" class="map-type-btn" :aria-pressed="isSatellite" @click="toggleMapType">
       {{ isSatellite ? 'Street' : 'Satellite' }}

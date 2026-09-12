@@ -7,6 +7,7 @@ import { fallbackPointFor, geocodeLocation } from '../../utils/geocode'
 import type { MapRouteStop } from '../../types/route'
 import type { Destination, DestinationCoordinates } from '../../types/destination'
 import { SERVICE_DESTINATION_ID_OFFSET, destinationForServiceId, findService } from '../../utils/serviceCatalog'
+import { t } from '../../composables/useLanguage'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 import MapView from '../../components/explore/MapView.vue'
@@ -126,8 +127,8 @@ const routeStops = computed<MapRouteStop[]>(() => {
   const origin: Destination = {
     id: -1,
     name: originLabel.value,
-    country: 'Current position',
-    category: 'Starting point',
+    country: t('Current position'),
+    category: t('Starting point'),
     rating: 0,
     bestTime: '',
     estimatedCost: '',
@@ -155,14 +156,14 @@ const isServiceRoute = computed(() => Boolean(focusedServiceStop.value))
 const isFocusedRoute = computed(() => isDestinationRoute.value || isServiceRoute.value)
 const focusedName = computed(() => selectedDestination.value?.name ?? focusedService.value?.name ?? '')
 const mapBackLabel = computed(() =>
-  backLabelFor(previousFullPath.value, isServiceRoute.value ? 'Back to Service' : isDestinationRoute.value ? 'Back to Destination' : 'Back to Trip Planner')
+  t(backLabelFor(previousFullPath.value, isServiceRoute.value ? 'Back to Service' : isDestinationRoute.value ? 'Back to Destination' : 'Back to Trip Planner'))
 )
 const mapBackFallback = computed(() =>
   isServiceRoute.value ? '/explore' : isDestinationRoute.value ? `/explore/${selectedDestination.value?.id}` : '/trip-planner'
 )
 const routeTitle = computed(() => {
-  if (isServiceRoute.value) return `${focusedService.value?.name} Location`
-  return isDestinationRoute.value ? `${selectedDestination.value?.name} Location` : 'View Route'
+  if (isServiceRoute.value) return t('{name} Location', { name: focusedService.value?.name ?? '' })
+  return isDestinationRoute.value ? t('{name} Location', { name: selectedDestination.value?.name ?? '' }) : t('View Route')
 })
 const routeSubtitle = computed(() => {
   if (isServiceRoute.value) {
@@ -172,7 +173,7 @@ const routeSubtitle = computed(() => {
   }
   return isDestinationRoute.value
     ? `${selectedDestination.value?.country} · ${selectedDestination.value?.coordinates.latitude.toFixed(4)}, ${selectedDestination.value?.coordinates.longitude.toFixed(4)}`
-    : `${trip.value.destination || 'Plan your destinations'} · ${trip.value.days} Days · ${trip.value.items.length} Activities`
+    : t('{destination} · {days} Days · {activities} Activities', { destination: trip.value.destination || t('Plan your destinations'), days: trip.value.days, activities: trip.value.items.length })
 })
 
 watch(routeStops, (stops) => {
@@ -208,40 +209,40 @@ function displayDirections() {
     mapView.value?.setRouteLineVisible(true)
     mapView.value?.setMarkersVisible(true)
     mapView.value?.fitRoute()
-    showNotice('Route displayed.')
+    showNotice(t('Route displayed.'))
   })
 }
 
 function startRoute() {
   requestCurrentLocation((coordinates) => {
     navigationOrigin.value = coordinates
-    originLabel.value = 'Your location'
+    originLabel.value = t('Your location')
     directionsActive.value = false
     routeStarted.value = true
     selectedIndex.value = 0
     nextTick(() => {
       mapView.value?.fitRoute()
       mapView.value?.highlightSegment(0)
-      showNotice(`Navigation started to ${baseRouteStops.value[0]?.destination.name}.`)
+      showNotice(t('Navigation started to {name}.', { name: baseRouteStops.value[0]?.destination.name ?? '' }))
     })
   })
 }
 
 function requestCurrentLocation(onSuccess: (coordinates: DestinationCoordinates) => void) {
   if (!navigator.geolocation) {
-    showNotice('Location access is not available in this browser.')
+    showNotice(t('Location access is not available in this browser.'))
     return
   }
   navigator.geolocation.getCurrentPosition(
     ({ coords }) => onSuccess({ latitude: coords.latitude, longitude: coords.longitude }),
-    () => showNotice('Location access is required to start navigation.')
+    () => showNotice(t('Location access is required to start navigation.'))
   )
 }
 
 function useCurrentLocationForDirections() {
   requestCurrentLocation((coordinates) => {
     navigationOrigin.value = coordinates
-    originLabel.value = 'Your location'
+    originLabel.value = t('Your location')
     directionsOpen.value = false
     displayDirections()
   })
@@ -259,7 +260,7 @@ async function submitDirections() {
       const results = await response.json() as Array<{ lat: string; lon: string; display_name: string }>
       const result = results[0]
       if (!result) {
-        directionsError.value = 'We could not find that location. Try a city, address, or landmark.'
+        directionsError.value = t('We could not find that location. Try a city, address, or landmark.')
         return
       }
       navigationOrigin.value = { latitude: Number(result.lat), longitude: Number(result.lon) }
@@ -268,7 +269,7 @@ async function submitDirections() {
       displayDirections()
       return
     } catch {
-      directionsError.value = 'Location search is unavailable. Try again or enter coordinates below.'
+      directionsError.value = t('Location search is unavailable. Try again or enter coordinates below.')
     } finally {
       isGeocoding.value = false
     }
@@ -277,42 +278,42 @@ async function submitDirections() {
   const latitude = Number(directionsLatitude.value)
   const longitude = Number(directionsLongitude.value)
   if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
-    directionsError.value = 'Enter a valid latitude (-90 to 90) and longitude (-180 to 180).'
+    directionsError.value = t('Enter a valid latitude (-90 to 90) and longitude (-180 to 180).')
     return
   }
   navigationOrigin.value = { latitude, longitude }
-  originLabel.value = 'Entered starting location'
+  originLabel.value = t('Entered starting location')
   directionsOpen.value = false
   displayDirections()
 }
 
 function locateUser() {
   if (!navigator.geolocation) {
-    showNotice('Location access is not available in this browser.')
+    showNotice(t('Location access is not available in this browser.'))
     return
   }
   navigator.geolocation.getCurrentPosition(
-    ({ coords }) => { mapView.value?.showUserLocation(coords.latitude, coords.longitude); showNotice('Showing your location.') },
-    () => showNotice('Location access is required to show your position.')
+    ({ coords }) => { mapView.value?.showUserLocation(coords.latitude, coords.longitude); showNotice(t('Showing your location.')) },
+    () => showNotice(t('Location access is required to show your position.'))
   )
 }
 
 async function shareRoute() {
-  const shareData = { title: routeTitle.value, text: `View ${routeTitle.value} on TravelGo`, url: window.location.href }
+  const shareData = { title: routeTitle.value, text: t('View {title} on TravelGo', { title: routeTitle.value }), url: window.location.href }
   if (navigator.share) {
     try { await navigator.share(shareData); return } catch { return }
   }
   try {
     await navigator.clipboard.writeText(window.location.href)
-    showNotice('Route link copied.')
-  } catch { showNotice('Unable to copy the route link.') }
+    showNotice(t('Route link copied.'))
+  } catch { showNotice(t('Unable to copy the route link.')) }
 }
 
 function toggleSave() {
   isSaved.value = !isSaved.value
   if (isSaved.value) localStorage.setItem(savedRouteKey.value, 'true')
   else localStorage.removeItem(savedRouteKey.value)
-  showNotice(isSaved.value ? 'Route saved.' : 'Route removed from saved routes.')
+  showNotice(isSaved.value ? t('Route saved.') : t('Route removed from saved routes.'))
 }
 
 function toggleRouteLine() {
@@ -333,7 +334,7 @@ function clearRoute() {
   mapView.value?.setRouteLineVisible(false)
   mapView.value?.setMarkersVisible(false)
   showMore.value = false
-  showNotice('Route cleared. Use Directions to restore it.')
+  showNotice(t('Route cleared. Use Directions to restore it.'))
 }
 
 async function toggleFullscreen() {
@@ -352,7 +353,7 @@ function changeMapType(type: 'street' | 'satellite') {
   <section class="route-page">
     <header class="route-header">
       <div>
-        <p class="eyebrow">Your journey</p>
+        <p class="eyebrow">{{ t('Your journey') }}</p>
         <h1>{{ routeTitle }}</h1>
         <div class="trip-info"><strong>{{ isFocusedRoute ? focusedName : trip.name }}</strong><span>{{ routeSubtitle }}</span></div>
       </div>
@@ -361,54 +362,54 @@ function changeMapType(type: 'street' | 'satellite') {
 
     <section v-if="directionsOpen" class="directions-dialog" aria-labelledby="directions-title">
       <div class="directions-dialog-header">
-        <div><p class="eyebrow">Directions</p><h2 id="directions-title">Choose a starting location</h2></div>
-        <button type="button" class="dialog-close" aria-label="Close directions" @click="directionsOpen = false">&times;</button>
+        <div><p class="eyebrow">{{ t('Directions') }}</p><h2 id="directions-title">{{ t('Choose a starting location') }}</h2></div>
+        <button type="button" class="dialog-close" :aria-label="t('Close directions')" @click="directionsOpen = false">&times;</button>
       </div>
-      <p class="dialog-copy">Tell us where your journey begins, then we will draw the route to {{ baseRouteStops[0]?.destination.name }}.</p>
-      <div class="dialog-actions"><Button variant="accent" @click="useCurrentLocationForDirections"><Icon name="navigation" :size="16" /> Use my current location</Button></div>
+      <p class="dialog-copy">{{ t('Tell us where your journey begins, then we will draw the route to {name}.', { name: baseRouteStops[0]?.destination.name ?? '' }) }}</p>
+      <div class="dialog-actions"><Button variant="accent" @click="useCurrentLocationForDirections"><Icon name="navigation" :size="16" /> {{ t('Use my current location') }}</Button></div>
       <form class="coordinates-form" @submit.prevent="submitDirections">
-        <label class="location-field">Starting place or address<input v-model="directionsLocation" type="search" placeholder="e.g. Phnom Penh, Cambodia" autocomplete="street-address" /></label>
-        <label>Starting latitude<input v-model="directionsLatitude" type="number" step="any" min="-90" max="90" placeholder="e.g. 13.4125" /></label>
-        <label>Starting longitude<input v-model="directionsLongitude" type="number" step="any" min="-180" max="180" placeholder="e.g. 103.867" /></label>
+        <label class="location-field">{{ t('Starting place or address') }}<input v-model="directionsLocation" type="search" :placeholder="t('e.g. Phnom Penh, Cambodia')" autocomplete="street-address" /></label>
+        <label>{{ t('Starting latitude') }}<input v-model="directionsLatitude" type="number" step="any" min="-90" max="90" placeholder="e.g. 13.4125" /></label>
+        <label>{{ t('Starting longitude') }}<input v-model="directionsLongitude" type="number" step="any" min="-180" max="180" placeholder="e.g. 103.867" /></label>
         <p v-if="directionsError" class="form-error" role="alert">{{ directionsError }}</p>
-        <button type="submit" class="dialog-submit" :disabled="isGeocoding">{{ isGeocoding ? 'Finding location...' : 'Use entered location' }}</button>
+        <button type="submit" class="dialog-submit" :disabled="isGeocoding">{{ isGeocoding ? t('Finding location...') : t('Use entered location') }}</button>
       </form>
     </section>
 
-    <nav v-if="!isFocusedRoute && trip.days > 1" class="day-filter" aria-label="Filter route by day">
-      <button type="button" :class="{ active: activeDay === 0 }" @click="activeDay = 0">All Days</button>
-      <button v-for="day in trip.days" :key="day" type="button" :class="{ active: activeDay === day }" @click="activeDay = day">Day {{ day }}</button>
+    <nav v-if="!isFocusedRoute && trip.days > 1" class="day-filter" :aria-label="t('Filter route by day')">
+      <button type="button" :class="{ active: activeDay === 0 }" @click="activeDay = 0">{{ t('All Days') }}</button>
+      <button v-for="day in trip.days" :key="day" type="button" :class="{ active: activeDay === day }" @click="activeDay = day">{{ t('Day {day}', { day }) }}</button>
     </nav>
 
     <div v-if="hasRoute" class="route-layout">
       <div class="map-shell">
         <MapView ref="mapView" :stops="routeStops" :selected-index="selectedIndex" @select="selectedIndex = $event" />
         <div class="map-top-controls">
-          <button type="button" class="map-icon-button location-button" title="My Location" aria-label="My Location" @click="locateUser"><Icon name="navigation" :size="19" /></button>
+          <button type="button" class="map-icon-button location-button" :title="t('My Location')" :aria-label="t('My Location')" @click="locateUser"><Icon name="navigation" :size="19" /></button>
           <div class="more-control">
-            <button type="button" class="map-icon-button" title="More map actions" aria-label="More map actions" :aria-expanded="showMore" @click="showMore = !showMore"><Icon name="more-horizontal" :size="20" /></button>
+            <button type="button" class="map-icon-button" :title="t('More map actions')" :aria-label="t('More map actions')" :aria-expanded="showMore" @click="showMore = !showMore"><Icon name="more-horizontal" :size="20" /></button>
             <div v-if="showMore" class="more-menu">
-              <button type="button" @click="toggleFullscreen"><Icon name="fullscreen" :size="16" /> {{ isFullscreen ? 'Exit Fullscreen' : 'Fullscreen' }}</button>
-              <button type="button" @click="showSettings = !showSettings; showRouteOptions = false"><Icon name="settings" :size="16" /> Map Settings</button>
-              <button type="button" @click="showRouteOptions = !showRouteOptions; showSettings = false"><Icon name="route" :size="16" /> Route Options</button>
+              <button type="button" @click="toggleFullscreen"><Icon name="fullscreen" :size="16" /> {{ isFullscreen ? t('Exit Fullscreen') : t('Fullscreen') }}</button>
+              <button type="button" @click="showSettings = !showSettings; showRouteOptions = false"><Icon name="settings" :size="16" /> {{ t('Map Settings') }}</button>
+              <button type="button" @click="showRouteOptions = !showRouteOptions; showSettings = false"><Icon name="route" :size="16" /> {{ t('Route Options') }}</button>
               <div v-if="showSettings" class="submenu">
-                <button type="button" :class="{ active: mapType === 'street' }" @click="changeMapType('street')">Street map</button>
-                <button type="button" :class="{ active: mapType === 'satellite' }" @click="changeMapType('satellite')">Satellite map</button>
-                <button type="button" :class="{ active: routeMarkersVisible }" @click="toggleRouteMarkers">Route markers</button>
-                <button type="button" :class="{ active: routeLineVisible }" @click="toggleRouteLine">Route line</button>
+                <button type="button" :class="{ active: mapType === 'street' }" @click="changeMapType('street')">{{ t('Street map') }}</button>
+                <button type="button" :class="{ active: mapType === 'satellite' }" @click="changeMapType('satellite')">{{ t('Satellite map') }}</button>
+                <button type="button" :class="{ active: routeMarkersVisible }" @click="toggleRouteMarkers">{{ t('Route markers') }}</button>
+                <button type="button" :class="{ active: routeLineVisible }" @click="toggleRouteLine">{{ t('Route line') }}</button>
               </div>
               <div v-if="showRouteOptions" class="submenu">
-                <button type="button" @click="mapView?.fitRoute(); showMore = false">Show all route</button>
-                <button type="button" @click="clearRoute">Clear route</button>
+                <button type="button" @click="mapView?.fitRoute(); showMore = false">{{ t('Show all route') }}</button>
+                <button type="button" @click="clearRoute">{{ t('Clear route') }}</button>
               </div>
             </div>
           </div>
         </div>
         <div class="map-bottom-controls">
-          <button type="button" class="action-button" :class="{ active: directionsActive }" :aria-pressed="directionsActive" @click="showDirections"><Icon name="route" :size="17" /> Directions</button>
-          <button type="button" class="action-button start-button" :class="{ active: routeStarted }" @click="startRoute"><Icon name="navigation" :size="17" /> {{ routeStarted ? 'Started' : 'Start' }}</button>
-          <button type="button" class="action-button" @click="shareRoute"><Icon name="share" :size="17" /> Share</button>
-          <button type="button" class="action-button" :class="{ active: isSaved }" @click="toggleSave"><Icon :name="isSaved ? 'bookmark-filled' : 'bookmark'" :size="17" /> {{ isSaved ? 'Saved' : 'Save' }}</button>
+          <button type="button" class="action-button" :class="{ active: directionsActive }" :aria-pressed="directionsActive" @click="showDirections"><Icon name="route" :size="17" /> {{ t('Directions') }}</button>
+          <button type="button" class="action-button start-button" :class="{ active: routeStarted }" @click="startRoute"><Icon name="navigation" :size="17" /> {{ routeStarted ? t('Started') : t('Start') }}</button>
+          <button type="button" class="action-button" @click="shareRoute"><Icon name="share" :size="17" /> {{ t('Share') }}</button>
+          <button type="button" class="action-button" :class="{ active: isSaved }" @click="toggleSave"><Icon :name="isSaved ? 'bookmark-filled' : 'bookmark'" :size="17" /> {{ isSaved ? t('Saved') : t('Save') }}</button>
         </div>
         <p v-if="notice" class="map-notice" role="status">{{ notice }}</p>
       </div>
@@ -416,9 +417,9 @@ function changeMapType(type: 'street' | 'satellite') {
     </div>
 
     <div v-else class="empty-route">
-      <h2>No route available yet.</h2>
-      <p>Add at least 2 places to your itinerary<br>to view your route.</p>
-      <Button variant="accent" @click="goBack('/trip-planner')">Back to Trip Planner</Button>
+      <h2>{{ t('No route available yet.') }}</h2>
+      <p>{{ t('Add at least 2 places to your itinerary') }}<br>{{ t('to view your route.') }}</p>
+      <Button variant="accent" @click="goBack('/trip-planner')">{{ t('Back to Trip Planner') }}</Button>
     </div>
   </section>
 </template>

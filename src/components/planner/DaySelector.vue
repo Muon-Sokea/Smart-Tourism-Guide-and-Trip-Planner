@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t } from '../../composables/useLanguage'
+
 defineProps<{
   totalDays: number
   modelValue: number
@@ -19,7 +21,7 @@ defineEmits<{
       :class="{ active: modelValue === day }"
       @click="$emit('update:modelValue', day)"
     >
-      Day {{ day }}
+      {{ t('Day {day}', { day }) }}
     </button>
   </div>
 </template>

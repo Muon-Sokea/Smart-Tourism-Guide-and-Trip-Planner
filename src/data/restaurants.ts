@@ -8,7 +8,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Phnom Penh, Cambodia',
     category: 'Khmer Cuisine',
     rating: 4.8,
-    price: '$$',
+    price: '$18 per person',
     image:
       'https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -22,7 +22,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Tokyo, Japan',
     category: 'Japanese',
     rating: 4.7,
-    price: '$$$',
+    price: '$48 per person',
     image:
       'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -36,7 +36,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Bali, Indonesia',
     category: 'Indonesian',
     rating: 4.6,
-    price: '$$',
+    price: '$14 per person',
     image:
       'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -50,7 +50,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Siem Reap, Cambodia',
     category: 'Khmer Cuisine',
     rating: 4.8,
-    price: '$$',
+    price: '$16 per person',
     image:
       'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -64,7 +64,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Bangkok, Thailand',
     category: 'Thai Cuisine',
     rating: 4.7,
-    price: '$$',
+    price: '$12 per person',
     image:
       'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -78,7 +78,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Ho Chi Minh City, Vietnam',
     category: 'Vietnamese',
     rating: 4.7,
-    price: '$$',
+    price: '$11 per person',
     image:
       'https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -92,7 +92,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Kyoto, Japan',
     category: 'Japanese',
     rating: 4.9,
-    price: '$$$',
+    price: '$52 per person',
     image:
       'https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -106,7 +106,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Ubud, Indonesia',
     category: 'Local Food',
     rating: 4.8,
-    price: '$$',
+    price: '$13 per person',
     image:
       'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -120,7 +120,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Phuket, Thailand',
     category: 'Seafood',
     rating: 4.6,
-    price: '$$$',
+    price: '$42 per person',
     image:
       'https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -134,7 +134,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Hanoi, Vietnam',
     category: 'Street Food',
     rating: 4.7,
-    price: '$',
+    price: '$7 per person',
     image:
       'https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -148,7 +148,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Koh Samui, Thailand',
     category: 'Seafood',
     rating: 4.8,
-    price: '$$$',
+    price: '$45 per person',
     image:
       'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
     description:
@@ -162,7 +162,7 @@ export const restaurants: ExploreContent[] = [
     location: 'Siem Reap, Cambodia',
     category: 'Cambodian & Asian',
     rating: 4.9,
-    price: '$$',
+    price: '$15 per person',
     image:
       'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
     description:

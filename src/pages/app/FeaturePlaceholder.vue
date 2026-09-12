@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import Icon from '../../components/common/Icon.vue'
+import { t } from '../../composables/useLanguage'
 
 const route = useRoute()
 </script>
@@ -8,9 +9,9 @@ const route = useRoute()
 <template>
   <div class="placeholder container">
     <Icon name="compass" :size="32" />
-    <p class="eyebrow">TravelGo workspace</p>
-    <h1>{{ route.meta.title || 'Coming soon' }}</h1>
-    <p>This part of your travel companion is ready for its feature module.</p>
+    <p class="eyebrow">{{ t('TravelGo workspace') }}</p>
+    <h1>{{ route.meta.title || t('Coming soon') }}</h1>
+    <p>{{ t('This part of your travel companion is ready for its feature module.') }}</p>
   </div>
 </template>
 

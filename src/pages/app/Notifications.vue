@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotifications } from '../../composables/useNotifications'
+import { t } from '../../composables/useLanguage'
 import { notificationKindMeta, relativeTime, dayGroupFor } from '../../utils/notifications'
 import type { AppNotification, NotificationKind } from '../../types/notification'
 import Button from '../../components/common/Button.vue'
@@ -13,14 +14,14 @@ const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useN
 const activeFilter = ref<'all' | NotificationKind>('all')
 const confirmClear = ref(false)
 
-const filters: Array<{ key: 'all' | NotificationKind; label: string }> = [
-  { key: 'all', label: 'All' },
-  { key: 'booking', label: 'Booking' },
-  { key: 'trip', label: 'Trip Planner' },
-  { key: 'reminder', label: 'Reminder' },
-  { key: 'travel-update', label: 'Travel Update' },
-  { key: 'system', label: 'System' },
-]
+const filters = computed<Array<{ key: 'all' | NotificationKind; label: string }>>(() => [
+  { key: 'all', label: t('All') },
+  { key: 'booking', label: t('Booking') },
+  { key: 'trip', label: t('Trip Planner') },
+  { key: 'reminder', label: t('Reminder') },
+  { key: 'travel-update', label: t('Travel Update') },
+  { key: 'system', label: t('System') },
+])
 
 const filtered = computed(() =>
   activeFilter.value === 'all'
@@ -56,10 +57,10 @@ function executeClearAll() {
     <div class="container">
       <header class="page-header">
         <div>
-          <p class="eyebrow">Stay in the loop</p>
-          <h1>Notifications</h1>
+          <p class="eyebrow">{{ t('Stay in the loop') }}</p>
+          <h1>{{ t('Notifications') }}</h1>
           <p class="page-subtitle">
-            Bookings, trip updates and reminders in one place — newest first.
+            {{ t('Bookings, trip updates and reminders in one place — newest first.') }}
           </p>
         </div>
         <div class="header-actions">
@@ -68,13 +69,13 @@ function executeClearAll() {
             :disabled="!unreadCount"
             @click="markAllAsRead()"
           >
-            <Icon name="check" :size="15" /> Mark all as read
+            <Icon name="check" :size="15" /> {{ t('Mark all as read') }}
           </Button>
         </div>
       </header>
 
       <section class="toolbar">
-        <div class="filter-row" role="tablist" aria-label="Filter notifications by type">
+        <div class="filter-row" role="tablist" :aria-label="t('Filter notifications by type')">
           <button
             v-for="filter in filters"
             :key="filter.key"
@@ -93,17 +94,17 @@ function executeClearAll() {
             class="clear-btn"
             @click="confirmClear = !confirmClear"
           >
-            <Icon name="trash" :size="14" /> Clear all
+            <Icon name="trash" :size="14" /> {{ t('Clear all') }}
           </button>
           <div v-if="confirmClear" class="confirm-clear">
-            <span>Delete all notifications?</span>
-            <button type="button" class="confirm-yes" @click="executeClearAll">Yes</button>
-            <button type="button" class="confirm-no" @click="confirmClear = false">No</button>
+            <span>{{ t('Delete all notifications?') }}</span>
+            <button type="button" class="confirm-yes" @click="executeClearAll">{{ t('Yes') }}</button>
+            <button type="button" class="confirm-no" @click="confirmClear = false">{{ t('No') }}</button>
           </div>
         </div>
       </section>
 
-      <section v-if="filtered.length" class="notification-list" aria-label="Notification list">
+      <section v-if="filtered.length" class="notification-list" :aria-label="t('Notification list')">
         <div v-for="group in grouped" :key="group.label" class="day-group">
           <p class="day-label">{{ group.label }}</p>
           <article
@@ -122,9 +123,9 @@ function executeClearAll() {
             <div class="notification-body">
               <div class="notification-top">
                 <span class="kind-tag" :class="notificationKindMeta[notification.kind].cssClass">
-                  {{ notificationKindMeta[notification.kind].label }}
+                  {{ t(notificationKindMeta[notification.kind].label) }}
                 </span>
-                <span v-if="!notification.read" class="unread-dot" aria-label="Unread" />
+                <span v-if="!notification.read" class="unread-dot" :aria-label="t('Unread')" />
               </div>
               <h3 class="notification-title">{{ notification.title }}</h3>
               <p class="notification-message">{{ notification.message }}</p>
@@ -139,17 +140,17 @@ function executeClearAll() {
 
       <div v-else class="empty-state">
         <Icon name="bell" :size="40" />
-        <h2>No notifications here</h2>
+        <h2>{{ t('No notifications here') }}</h2>
         <p>
           {{
             activeFilter === 'all'
-              ? "You're all caught up — new activity will show up here."
-              : `No ${filters.find((f) => f.key === activeFilter)?.label} notifications yet.`
+              ? t("You're all caught up — new activity will show up here.")
+              : t('No {label} notifications yet.', { label: filters.find((f) => f.key === activeFilter)?.label ?? '' })
           }}
         </p>
-        <Button variant="accent" to="/explore">Start Exploring</Button>
+        <Button variant="accent" to="/explore">{{ t('Start Exploring') }}</Button>
         <div class="empty-clear" v-if="notifications.length">
-          <button type="button" class="clear-btn" @click="clearAll">Clear all</button>
+          <button type="button" class="clear-btn" @click="clearAll">{{ t('Clear all') }}</button>
         </div>
       </div>
     </div>

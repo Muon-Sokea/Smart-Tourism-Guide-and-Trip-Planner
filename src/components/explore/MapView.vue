@@ -3,6 +3,7 @@ import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { MapRouteStop } from '../../types/route'
+import { t } from '../../composables/useLanguage'
 
 const props = defineProps<{
   stops: MapRouteStop[]
@@ -178,7 +179,7 @@ defineExpose({ fitRoute, focusStop, highlightSegment, showUserLocation, setRoute
 </script>
 
 <template>
-  <div ref="mapElement" class="map-view" aria-label="Interactive itinerary map"></div>
+  <div ref="mapElement" class="map-view" :aria-label="t('Interactive itinerary map')"></div>
 </template>
 
 <style>

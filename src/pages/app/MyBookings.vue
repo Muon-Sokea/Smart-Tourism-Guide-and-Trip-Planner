@@ -6,6 +6,7 @@ import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 import type { Booking, BookingStatus } from '../../types/booking'
 import type { ExploreContentType } from '../../types/explore'
+import { t, dateLocale } from '../../composables/useLanguage'
 
 const { bookings, cancelBooking } = useBookings()
 
@@ -14,12 +15,12 @@ const selectedBookingId = ref<string | null>(null)
 const selectedBooking = computed(() => selectedBookingId.value ? bookings.value.find(b => b.id === selectedBookingId.value) || null : null)
 const confirmCancelId = ref<string | null>(null)
 
-const filters: { label: string; value: 'all' | ExploreContentType }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Hotels', value: 'hotel' },
-  { label: 'Restaurants', value: 'restaurant' },
-  { label: 'Activities', value: 'activity' },
-]
+const filters = computed<{ label: string; value: 'all' | ExploreContentType }[]>(() => [
+  { label: t('All'), value: 'all' },
+  { label: t('Hotels'), value: 'hotel' },
+  { label: t('Restaurants'), value: 'restaurant' },
+  { label: t('Activities'), value: 'activity' },
+])
 
 const filteredBookings = computed(() =>
   activeFilter.value === 'all'
@@ -59,7 +60,7 @@ function getBookingService(booking: Booking) {
 
 function formatDate(value?: string): string {
   if (!value) return '—'
-  return new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`))
+  return new Intl.DateTimeFormat(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`))
 }
 
 function statusClass(status: BookingStatus): string {
@@ -84,15 +85,15 @@ function typeIcon(type: ExploreContentType): string {
       <!-- Booking Details View -->
       <template v-if="selectedBooking">
         <div class="detail-header">
-          <button type="button" class="back-btn" @click="backToList"><Icon name="arrow-left" :size="16" /> Back to My Bookings</button>
+          <button type="button" class="back-btn" @click="backToList"><Icon name="arrow-left" :size="16" /> {{ t('Back to My Bookings') }}</button>
           <div class="detail-actions">
-            <Button :to="`/services/${selectedBooking.serviceType}/${selectedBooking.serviceId}`" variant="outline"><Icon name="compass" :size="15" /> View Service</Button>
+            <Button :to="`/services/${selectedBooking.serviceType}/${selectedBooking.serviceId}`" variant="outline"><Icon name="compass" :size="15" /> {{ t('View Service') }}</Button>
           </div>
         </div>
 
         <header class="detail-hero">
           <div>
-            <p class="eyebrow">{{ serviceLabel(selectedBooking.serviceType) }} Booking</p>
+            <p class="eyebrow">{{ t(serviceLabel(selectedBooking.serviceType)) }} {{ t('Booking') }}</p>
             <h1>{{ selectedBooking.serviceName }}</h1>
             <p class="detail-subtitle">{{ selectedBooking.id }}</p>
           </div>
@@ -106,67 +107,67 @@ function typeIcon(type: ExploreContentType): string {
 
         <!-- Booking Information -->
         <section class="detail-section">
-          <h2>Booking Information</h2>
+          <h2>{{ t('Booking Information') }}</h2>
           <dl class="info-list">
-            <div><dt>Booking Reference</dt><dd>{{ selectedBooking.id }}</dd></div>
-            <div><dt>Service</dt><dd>{{ selectedBooking.serviceName }}</dd></div>
-            <div><dt>Type</dt><dd>{{ serviceLabel(selectedBooking.serviceType) }}</dd></div>
-            <div v-if="getBookingService(selectedBooking)?.location"><dt>Location</dt><dd>{{ getBookingService(selectedBooking)!.location }}</dd></div>
-            <div><dt>Status</dt><dd><span class="status-badge" :class="statusClass(selectedBooking.status)">{{ selectedBooking.status }}</span></dd></div>
+            <div><dt>{{ t('Booking Reference') }}</dt><dd>{{ selectedBooking.id }}</dd></div>
+            <div><dt>{{ t('Service') }}</dt><dd>{{ selectedBooking.serviceName }}</dd></div>
+            <div><dt>{{ t('Type') }}</dt><dd>{{ t(serviceLabel(selectedBooking.serviceType)) }}</dd></div>
+            <div v-if="getBookingService(selectedBooking)?.location"><dt>{{ t('Location') }}</dt><dd>{{ getBookingService(selectedBooking)!.location }}</dd></div>
+            <div><dt>{{ t('Status') }}</dt><dd><span class="status-badge" :class="statusClass(selectedBooking.status)">{{ t(selectedBooking.status) }}</span></dd></div>
           </dl>
         </section>
 
         <!-- Hotel Details -->
         <section v-if="selectedBooking.serviceType === 'hotel'" class="detail-section">
-          <h2>Stay Details</h2>
+          <h2>{{ t('Stay Details') }}</h2>
           <dl class="info-list">
-            <div><dt>Check-in</dt><dd>{{ formatDate(selectedBooking.startDate) }}</dd></div>
-            <div><dt>Check-out</dt><dd>{{ formatDate(selectedBooking.endDate) }}</dd></div>
-            <div v-if="selectedBooking.roomType"><dt>Room Type</dt><dd>{{ selectedBooking.roomType }}</dd></div>
-            <div v-if="selectedBooking.numberOfRooms"><dt>Number of Rooms</dt><dd>{{ selectedBooking.numberOfRooms }}</dd></div>
-            <div v-if="selectedBooking.guests"><dt>Guests</dt><dd>{{ selectedBooking.guests }}</dd></div>
+            <div><dt>{{ t('Check-in') }}</dt><dd>{{ formatDate(selectedBooking.startDate) }}</dd></div>
+            <div><dt>{{ t('Check-out') }}</dt><dd>{{ formatDate(selectedBooking.endDate) }}</dd></div>
+            <div v-if="selectedBooking.roomType"><dt>{{ t('Room Type') }}</dt><dd>{{ selectedBooking.roomType }}</dd></div>
+            <div v-if="selectedBooking.numberOfRooms"><dt>{{ t('Number of Rooms') }}</dt><dd>{{ selectedBooking.numberOfRooms }}</dd></div>
+            <div v-if="selectedBooking.guests"><dt>{{ t('Guests') }}</dt><dd>{{ selectedBooking.guests }}</dd></div>
           </dl>
         </section>
 
         <!-- Restaurant Details -->
         <section v-if="selectedBooking.serviceType === 'restaurant'" class="detail-section">
-          <h2>Reservation Details</h2>
+          <h2>{{ t('Reservation Details') }}</h2>
           <dl class="info-list">
-            <div><dt>Date</dt><dd>{{ formatDate(selectedBooking.date) }}</dd></div>
-            <div v-if="selectedBooking.time"><dt>Time</dt><dd>{{ selectedBooking.time }}</dd></div>
-            <div v-if="selectedBooking.guests"><dt>Number of Guests</dt><dd>{{ selectedBooking.guests }}</dd></div>
-            <div v-if="selectedBooking.specialRequest"><dt>Special Request</dt><dd>{{ selectedBooking.specialRequest }}</dd></div>
+            <div><dt>{{ t('Date') }}</dt><dd>{{ formatDate(selectedBooking.date) }}</dd></div>
+            <div v-if="selectedBooking.time"><dt>{{ t('Time') }}</dt><dd>{{ selectedBooking.time }}</dd></div>
+            <div v-if="selectedBooking.guests"><dt>{{ t('Number of Guests') }}</dt><dd>{{ selectedBooking.guests }}</dd></div>
+            <div v-if="selectedBooking.specialRequest"><dt>{{ t('Special Request') }}</dt><dd>{{ selectedBooking.specialRequest }}</dd></div>
           </dl>
         </section>
 
         <!-- Activity Details -->
         <section v-if="selectedBooking.serviceType === 'activity'" class="detail-section">
-          <h2>Activity Details</h2>
+          <h2>{{ t('Activity Details') }}</h2>
           <dl class="info-list">
-            <div><dt>Date</dt><dd>{{ formatDate(selectedBooking.date) }}</dd></div>
-            <div v-if="selectedBooking.time"><dt>Time</dt><dd>{{ selectedBooking.time }}</dd></div>
-            <div v-if="selectedBooking.participants"><dt>Participants</dt><dd>{{ selectedBooking.participants }}</dd></div>
+            <div><dt>{{ t('Date') }}</dt><dd>{{ formatDate(selectedBooking.date) }}</dd></div>
+            <div v-if="selectedBooking.time"><dt>{{ t('Time') }}</dt><dd>{{ selectedBooking.time }}</dd></div>
+            <div v-if="selectedBooking.participants"><dt>{{ t('Participants') }}</dt><dd>{{ selectedBooking.participants }}</dd></div>
           </dl>
         </section>
 
         <!-- Price -->
         <section class="detail-section price-section">
-          <h2>Price</h2>
+          <h2>{{ t('Price') }}</h2>
           <div class="price-breakdown">
-            <div class="price-row" v-if="selectedBooking.price"><span>Unit Price</span><strong>${{ selectedBooking.price }}</strong></div>
-            <div class="price-row total"><span>Total</span><strong>${{ selectedBooking.totalPrice }}</strong></div>
+            <div class="price-row" v-if="selectedBooking.price"><span>{{ t('Unit Price') }}</span><strong>${{ selectedBooking.price }}</strong></div>
+            <div class="price-row total"><span>{{ t('Total') }}</span><strong>${{ selectedBooking.totalPrice }}</strong></div>
           </div>
         </section>
 
         <!-- Actions -->
         <div class="detail-footer" v-if="selectedBooking.status === 'Confirmed' || selectedBooking.status === 'Pending'">
           <template v-if="confirmCancelId !== selectedBooking.id">
-            <Button variant="outline" @click="confirmCancel(selectedBooking.id)"><Icon name="x" :size="15" /> Cancel Booking</Button>
+            <Button variant="outline" @click="confirmCancel(selectedBooking.id)"><Icon name="x" :size="15" /> {{ t('Cancel Booking') }}</Button>
           </template>
           <div v-else class="confirm-cancel">
-            <span>Are you sure you want to cancel this booking?</span>
-            <Button variant="accent" @click="executeCancel">Yes, Cancel</Button>
-            <Button variant="outline" @click="cancelCancel">No, Keep</Button>
+            <span>{{ t('Are you sure you want to cancel this booking?') }}</span>
+            <Button variant="accent" @click="executeCancel">{{ t('Yes, Cancel') }}</Button>
+            <Button variant="outline" @click="cancelCancel">{{ t('No, Keep') }}</Button>
           </div>
         </div>
       </template>
@@ -175,9 +176,9 @@ function typeIcon(type: ExploreContentType): string {
       <template v-else>
         <header class="page-header">
           <div>
-            <p class="eyebrow">Your bookings</p>
-            <h1>My Bookings</h1>
-            <p class="page-subtitle">Manage your hotel, restaurant, and activity bookings.</p>
+            <p class="eyebrow">{{ t('Your bookings') }}</p>
+            <h1>{{ t('My Bookings') }}</h1>
+            <p class="page-subtitle">{{ t('Manage your hotel, restaurant, and activity bookings.') }}</p>
           </div>
         </header>
 
@@ -195,11 +196,11 @@ function typeIcon(type: ExploreContentType): string {
         <!-- Empty State -->
         <div v-if="!filteredBookings.length" class="empty-state">
           <Icon name="bookmark" :size="40" />
-          <h2 v-if="activeFilter === 'all'">No bookings yet</h2>
-          <h2 v-else>No {{ activeFilter === 'hotel' ? 'hotel' : activeFilter === 'restaurant' ? 'restaurant' : 'activity' }} bookings</h2>
-          <p v-if="activeFilter === 'all'">Explore hotels, restaurants, and activities and make your first booking.</p>
-          <p v-else>You haven't booked any {{ activeFilter === 'hotel' ? 'hotels' : activeFilter === 'restaurant' ? 'restaurants' : 'activities' }} yet.</p>
-          <Button to="/explore" variant="accent"><Icon name="compass" :size="16" /> Explore Services</Button>
+          <h2 v-if="activeFilter === 'all'">{{ t('No bookings yet') }}</h2>
+          <h2 v-else>{{ activeFilter === 'hotel' ? t('No hotel bookings') : activeFilter === 'restaurant' ? t('No restaurant bookings') : t('No activity bookings') }}</h2>
+          <p v-if="activeFilter === 'all'">{{ t('Explore hotels, restaurants, and activities and make your first booking.') }}</p>
+          <p v-else>{{ activeFilter === 'hotel' ? t("You haven't booked any hotels yet.") : activeFilter === 'restaurant' ? t("You haven't booked any restaurants yet.") : t("You haven't booked any activities yet.") }}</p>
+          <Button to="/explore" variant="accent"><Icon name="compass" :size="16" /> {{ t('Explore Services') }}</Button>
         </div>
 
         <!-- Booking Cards -->
@@ -207,12 +208,12 @@ function typeIcon(type: ExploreContentType): string {
           <div v-for="booking in filteredBookings" :key="booking.id" class="booking-card">
             <div class="card-image" v-if="getBookingService(booking)?.image">
               <img :src="getBookingService(booking)!.image" :alt="booking.serviceName" />
-              <span class="card-type"><Icon :name="typeIcon(booking.serviceType)" :size="14" /> {{ serviceLabel(booking.serviceType) }}</span>
+              <span class="card-type"><Icon :name="typeIcon(booking.serviceType)" :size="14" /> {{ t(serviceLabel(booking.serviceType)) }}</span>
             </div>
             <div class="card-body">
               <div class="card-top">
                 <h3>{{ booking.serviceName }}</h3>
-                <span class="status-badge" :class="statusClass(booking.status)">{{ booking.status }}</span>
+                <span class="status-badge" :class="statusClass(booking.status)">{{ t(booking.status) }}</span>
               </div>
               <p v-if="getBookingService(booking)?.location" class="card-location"><Icon name="map-pin" :size="14" /> {{ getBookingService(booking)!.location }}</p>
               <div class="card-meta">
@@ -220,8 +221,8 @@ function typeIcon(type: ExploreContentType): string {
                 <span class="card-price">${{ booking.totalPrice }}</span>
               </div>
               <div class="card-actions">
-                <Button variant="primary" @click="viewDetails(booking.id)">View Details</Button>
-                <Button v-if="booking.status === 'Confirmed' || booking.status === 'Pending'" variant="outline" :to="`/services/${booking.serviceType}/${booking.serviceId}`"><Icon name="compass" :size="14" /> View Service</Button>
+                <Button variant="primary" @click="viewDetails(booking.id)">{{ t('View Details') }}</Button>
+                <Button v-if="booking.status === 'Confirmed' || booking.status === 'Pending'" variant="outline" :to="`/services/${booking.serviceType}/${booking.serviceId}`"><Icon name="compass" :size="14" /> {{ t('View Service') }}</Button>
               </div>
             </div>
           </div>
@@ -268,7 +269,8 @@ h2 { color: var(--color-primary); margin: 0 0 1rem; }
 .card-meta span { display: inline-flex; align-items: center; gap: 0.3rem; }
 .card-price { color: var(--color-primary); font-weight: 700; font-size: var(--fs-card-desc); }
 
-.card-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto; padding-top: 0.65rem; border-top: 1px solid rgba(var(--color-primary-rgb), 0.08); }
+.card-actions { display: flex; gap: 0.5rem; margin-top: auto; padding-top: 0.65rem; border-top: 1px solid rgba(var(--color-primary-rgb), 0.08); }
+.card-actions :deep(.btn) { flex: 1; padding: 0.5rem 0.8rem; }
 
 /* Status Badges */
 .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: var(--fs-small); font-weight: 600; white-space: nowrap; }

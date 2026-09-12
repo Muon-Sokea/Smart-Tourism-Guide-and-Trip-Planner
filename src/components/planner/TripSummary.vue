@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Icon from '../common/Icon.vue'
+import { t } from '../../composables/useLanguage'
 
 defineProps<{
   summary: {
@@ -11,7 +12,7 @@ defineProps<{
 }>()
 
 function formatTravelTime(minutes: number) {
-  if (minutes < 60) return `${minutes} min`
+  if (minutes < 60) return t('{minutes} min', { minutes })
   const hours = Math.floor(minutes / 60)
   const remainingMinutes = minutes % 60
   return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours}h`
@@ -20,31 +21,31 @@ function formatTravelTime(minutes: number) {
 
 <template>
   <div class="trip-summary">
-    <h2>Trip Summary</h2>
+    <h2>{{ t('Trip Summary') }}</h2>
 
     <div class="summary-grid">
       <div class="summary-item">
         <Icon name="map-pin" :size="20" />
         <span class="summary-value">{{ summary.places }}</span>
-        <span class="summary-label">Places</span>
+        <span class="summary-label">{{ t('Places') }}</span>
       </div>
 
       <div class="summary-item">
         <Icon name="calendar" :size="20" />
         <span class="summary-value">{{ summary.days }}</span>
-        <span class="summary-label">Days</span>
+        <span class="summary-label">{{ t('Days') }}</span>
       </div>
 
       <div class="summary-item">
         <Icon name="route" :size="20" />
         <span class="summary-value">{{ summary.distanceKm }} km</span>
-        <span class="summary-label">Est. Distance</span>
+        <span class="summary-label">{{ t('Est. Distance') }}</span>
       </div>
 
       <div class="summary-item">
         <Icon name="clock" :size="20" />
         <span class="summary-value">{{ formatTravelTime(summary.travelMinutes) }}</span>
-        <span class="summary-label">Est. Travel Time</span>
+        <span class="summary-label">{{ t('Est. Travel Time') }}</span>
       </div>
     </div>
   </div>

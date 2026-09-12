@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../../composables/useAuth'
 import { useBookings } from '../../composables/useBookings'
@@ -12,11 +12,11 @@ import {
   budgetOptions,
   currencyOptions,
   dateFormatOptions,
-  languageOptions,
   locationPermissionOptions,
   transportOptions,
   travelStyleOptions,
 } from '../../composables/useSettings'
+import { useLanguage, t, languageOptions } from '../../composables/useLanguage'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 import SettingsToggle from '../../components/settings/SettingsToggle.vue'
@@ -25,6 +25,8 @@ const router = useRouter()
 const { user, updateProfile, logout } = useAuth()
 const { theme, setTheme } = useTheme()
 const { settings, toggleActivity, resetSettings } = useSettings()
+// Language uses the one global state shared with the navbar button.
+const { language, setLanguage } = useLanguage()
 
 /* ---------- 1. Account ---------- */
 const isEditingProfile = ref(false)
@@ -52,25 +54,11 @@ function saveProfile() {
 
 /* ---------- 2. Appearance ---------- */
 const themeOptions = [
-  { value: 'light' as const, label: 'Light Mode', icon: 'sun' },
-  { value: 'dark' as const, label: 'Dark Mode', icon: 'moon' },
+  { value: 'light' as const, label: t('Light Mode'), icon: 'sun' },
+  { value: 'dark' as const, label: t('Dark Mode'), icon: 'moon' },
 ]
 
 /* ---------- 4. Language & Region ---------- */
-const datePreview = computed(() => {
-  const sample = new Date(2026, 8, 11)
-  const y = sample.getFullYear()
-  const m = String(sample.getMonth() + 1).padStart(2, '0')
-  const d = String(sample.getDate()).padStart(2, '0')
-  if (settings.value.dateFormat === 'mdy') return `${m}/${d}/${y}`
-  if (settings.value.dateFormat === 'iso') return `${y}-${m}-${d}`
-  return `${d}/${m}/${y}`
-})
-
-function formatBookingSample(value: string) {
-  if (settings.value.currency === 'KHR') return `${Math.round(Number(value) * 4100).toLocaleString()} ៛`
-  return `$${value}`
-}
 
 /* ---------- 7. Account Actions ---------- */
 const { bookings } = useBookings()
@@ -78,10 +66,8 @@ const { favoriteIds } = useFavorites()
 const { trips } = useMyTrips()
 
 const showDeleteModal = ref(false)
-const deleteConfirmText = ref('')
 
 function closeDeleteModal() {
-  deleteConfirmText.value = ''
   showDeleteModal.value = false
 }
 
@@ -109,43 +95,43 @@ function confirmDelete() {
   <div class="settings">
     <div class="container container--narrow">
       <header class="page-header">
-        <p class="eyebrow">Your account</p>
-        <h1>Settings</h1>
-        <p class="page-subtitle">Manage your profile, appearance, notifications, and travel preferences.</p>
+        <p class="eyebrow">{{ t('Your account') }}</p>
+        <h1>{{ t('Settings') }}</h1>
+        <p class="page-subtitle">{{ t('Manage your profile, appearance, notifications, and travel preferences.') }}</p>
       </header>
 
       <!-- 1. Account -->
       <section class="settings-card">
         <div class="card-head">
           <span class="card-icon"><Icon name="user" :size="16" /></span>
-          <h2>Account</h2>
+          <h2>{{ t('Account') }}</h2>
         </div>
 
         <dl v-if="!isEditingProfile" class="info-list">
           <div>
-            <dt>Profile</dt>
-            <dd>{{ user?.name || 'Travel Explorer' }}</dd>
+            <dt>{{ t('Profile') }}</dt>
+            <dd>{{ user?.name || t('Travel Explorer') }}</dd>
           </div>
           <div>
-            <dt>Email</dt>
+            <dt>{{ t('Email') }}</dt>
             <dd>{{ user?.email || '—' }}</dd>
           </div>
           <div>
-            <dt>Phone number</dt>
-            <dd>{{ user?.phone || 'Not set' }}</dd>
+            <dt>{{ t('Phone number') }}</dt>
+            <dd>{{ user?.phone || t('Not set') }}</dd>
           </div>
         </dl>
         <div v-else class="edit-grid">
           <label>
-            Name
+            {{ t('Name') }}
             <input v-model="profileForm.name" type="text" />
           </label>
           <label>
-            Email
+            {{ t('Email') }}
             <input v-model="profileForm.email" type="email" />
           </label>
           <label>
-            Phone number
+            {{ t('Phone number') }}
             <input v-model="profileForm.phone" type="tel" placeholder="+855 ..." />
           </label>
         </div>
@@ -154,15 +140,15 @@ function confirmDelete() {
           <template v-if="!isEditingProfile">
             <Button variant="outline" @click="startEditProfile">
               <Icon name="edit" :size="15" />
-              Edit Profile
+              {{ t('Edit Profile') }}
             </Button>
           </template>
           <template v-else>
             <Button variant="primary" @click="saveProfile">
               <Icon name="check" :size="15" />
-              Save Changes
+              {{ t('Save Changes') }}
             </Button>
-            <Button variant="outline" @click="isEditingProfile = false">Cancel</Button>
+            <Button variant="outline" @click="isEditingProfile = false">{{ t('Cancel') }}</Button>
           </template>
         </div>
       </section>
@@ -171,7 +157,7 @@ function confirmDelete() {
       <section class="settings-card">
         <div class="card-head">
           <span class="card-icon"><Icon name="sun" :size="16" /></span>
-          <h2>Appearance</h2>
+          <h2>{{ t('Appearance') }}</h2>
         </div>
         <div class="theme-grid">
           <button
@@ -184,12 +170,12 @@ function confirmDelete() {
             @click="setTheme(option.value)"
           >
             <Icon :name="option.icon" :size="18" />
-            <span>{{ option.label }}</span>
+            <span>{{ t(option.label) }}</span>
             <Icon v-if="theme === option.value" name="check" :size="15" class="theme-check" />
           </button>
         </div>
         <p class="card-hint">
-          The sun/moon button in the top navbar stays in sync as a quick toggle.
+          {{ t('The sun/moon button in the top navbar stays in sync as a quick toggle.') }}
         </p>
       </section>
 
@@ -197,27 +183,27 @@ function confirmDelete() {
       <section class="settings-card">
         <div class="card-head">
           <span class="card-icon"><Icon name="bell" :size="16" /></span>
-          <h2>Notifications</h2>
+          <h2>{{ t('Notifications') }}</h2>
         </div>
         <div class="toggle-list">
           <SettingsToggle
             v-model="settings.notifyBookings"
-            label="Booking updates"
-            description="Confirmations, changes, and cancellations for your bookings."
+            :label="t('Booking updates')"
+            :description="t('Confirmations, changes, and cancellations for your bookings.')"
           />
           <SettingsToggle
             v-model="settings.notifyTripReminders"
-            label="Trip reminders"
-            description="Reminders before upcoming trips and saved itineraries."
+            :label="t('Trip reminders')"
+            :description="t('Reminders before upcoming trips and saved itineraries.')"
           />
           <SettingsToggle
             v-model="settings.notifyServices"
-            label="Service and activity updates"
-            description="New hotels, restaurants, and activities near your destinations."
+            :label="t('Service and activity updates')"
+            :description="t('New hotels, restaurants, and activities near your destinations.')"
           />
         </div>
         <p class="card-hint">
-          Manage these from the bell icon in the navbar at any time.
+          {{ t('Manage these from the bell icon in the navbar at any time.') }}
         </p>
       </section>
 
@@ -225,19 +211,19 @@ function confirmDelete() {
       <section class="settings-card">
         <div class="card-head">
           <span class="card-icon"><Icon name="globe" :size="16" /></span>
-          <h2>Language &amp; Region</h2>
+          <h2>{{ t('Language & Region') }}</h2>
         </div>
         <div class="select-grid">
           <label>
-            Language
-            <select v-model="settings.language">
+            {{ t('Language') }}
+            <select :value="language" @change="setLanguage(($event.target as HTMLSelectElement).value as 'en' | 'km')">
               <option v-for="option in languageOptions" :key="option.value" :value="option.value">
                 {{ option.label }}
               </option>
             </select>
           </label>
           <label>
-            Currency
+            {{ t('Currency') }}
             <select v-model="settings.currency">
               <option v-for="option in currencyOptions" :key="option.value" :value="option.value">
                 {{ option.label }}
@@ -245,7 +231,7 @@ function confirmDelete() {
             </select>
           </label>
           <label>
-            Date format
+            {{ t('Date format') }}
             <select v-model="settings.dateFormat">
               <option v-for="option in dateFormatOptions" :key="option.value" :value="option.value">
                 {{ option.label }}
@@ -253,21 +239,17 @@ function confirmDelete() {
             </select>
           </label>
         </div>
-        <p class="card-hint">
-          Preview — today is <strong>{{ datePreview }}</strong>, a $25 booking shows as
-          <strong>{{ formatBookingSample('25') }}</strong>.
-        </p>
       </section>
 
       <!-- 5. Travel Preferences -->
       <section class="settings-card">
         <div class="card-head">
           <span class="card-icon"><Icon name="compass" :size="16" /></span>
-          <h2>Travel Preferences</h2>
+          <h2>{{ t('Travel Preferences') }}</h2>
         </div>
 
         <div class="pref-block">
-          <p class="pref-label">Travel style</p>
+          <p class="pref-label">{{ t('Travel style') }}</p>
           <div class="chip-row">
             <button
               v-for="style in travelStyleOptions"
@@ -277,13 +259,13 @@ function confirmDelete() {
               :class="{ active: settings.travelStyle === style }"
               @click="settings.travelStyle = style"
             >
-              {{ style }}
+              {{ t(style) }}
             </button>
           </div>
         </div>
 
         <div class="pref-block">
-          <p class="pref-label">Preferred activities</p>
+          <p class="pref-label">{{ t('Preferred activities') }}</p>
           <div class="chip-row">
             <button
               v-for="activity in activityOptions"
@@ -293,22 +275,22 @@ function confirmDelete() {
               :class="{ active: settings.preferredActivities.includes(activity) }"
               @click="toggleActivity(activity)"
             >
-              {{ activity }}
+              {{ t(activity) }}
             </button>
           </div>
         </div>
 
         <div class="select-grid">
           <label>
-            Budget preference
+            {{ t('Budget preference') }}
             <select v-model="settings.budgetPreference">
-              <option v-for="option in budgetOptions" :key="option" :value="option">{{ option }}</option>
+              <option v-for="option in budgetOptions" :key="option" :value="option">{{ t(option) }}</option>
             </select>
           </label>
           <label>
-            Transportation preference
+            {{ t('Transportation preference') }}
             <select v-model="settings.transportation">
-              <option v-for="option in transportOptions" :key="option" :value="option">{{ option }}</option>
+              <option v-for="option in transportOptions" :key="option" :value="option">{{ t(option) }}</option>
             </select>
           </label>
         </div>
@@ -318,14 +300,14 @@ function confirmDelete() {
       <section class="settings-card">
         <div class="card-head">
           <span class="card-icon"><Icon name="shield" :size="16" /></span>
-          <h2>Privacy</h2>
+          <h2>{{ t('Privacy') }}</h2>
         </div>
         <div class="select-grid select-grid--single">
           <label>
-            Location permission
+            {{ t('Location permission') }}
             <select v-model="settings.locationPermission">
               <option v-for="option in locationPermissionOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
+                {{ t(option.label) }}
               </option>
             </select>
           </label>
@@ -333,13 +315,13 @@ function confirmDelete() {
         <div class="toggle-list">
           <SettingsToggle
             v-model="settings.shareProfile"
-            label="Share profile with travel companions"
-            description="Let people you travel with see your name and avatar."
+            :label="t('Share profile with travel companions')"
+            :description="t('Let people you travel with see your name and avatar.')"
           />
           <SettingsToggle
             v-model="settings.personalizedRecommendations"
-            label="Personalized recommendations"
-            description="Use your favorites and trips to suggest places you may like."
+            :label="t('Personalized recommendations')"
+            :description="t('Use your favorites and trips to suggest places you may like.')"
           />
         </div>
       </section>
@@ -348,19 +330,19 @@ function confirmDelete() {
       <section class="settings-card account-actions">
         <div class="card-head">
           <span class="card-icon"><Icon name="lock" :size="16" /></span>
-          <h2>Account Actions</h2>
+          <h2>{{ t('Account Actions') }}</h2>
         </div>
         <div class="action-row">
-          <Button variant="outline" @click="handleLogout">
+          <Button variant="outline" class="logout-btn" @click="handleLogout">
             <Icon name="log-out" :size="15" />
-            Log Out
+            {{ t('Log Out') }}
           </Button>
           <Button variant="outline" class="danger-btn" @click="showDeleteModal = true">
             <Icon name="trash" :size="15" />
-            Delete Account
+            {{ t('Delete Account') }}
           </Button>
         </div>
-        <p class="card-hint">Deleting removes your local profile, trips, bookings, and favorites.</p>
+        <p class="danger-warning">{{ t('Deleting your account permanently removes your profile, trips, bookings, and favorites. This action cannot be undone.') }}</p>
       </section>
     </div>
 
@@ -370,41 +352,20 @@ function confirmDelete() {
         <header class="modal-header">
           <span class="modal-icon"><Icon name="alert" :size="20" /></span>
           <div class="modal-heading">
-            <h2 id="delete-modal-title">Delete Account?</h2>
-            <p>This action cannot be undone.</p>
+            <h2 id="delete-modal-title">{{ t('Delete your account?') }}</h2>
+            <p>{{ t('Are you sure you want to permanently delete your account?') }}</p>
           </div>
-          <button type="button" class="modal-close" aria-label="Close dialog" @click="closeDeleteModal">
+          <button type="button" class="modal-close" :aria-label="t('Close dialog')" @click="closeDeleteModal">
             <Icon name="x" :size="16" />
           </button>
         </header>
 
-        <div class="modal-body">
-          <p class="modal-warning">
-            This permanently removes everything stored for your account on this device:
-          </p>
-          <ul class="modal-list">
-            <li><Icon name="user" :size="14" /> Profile and account details</li>
-            <li><Icon name="route" :size="14" /> Saved trips and itineraries</li>
-            <li><Icon name="bookmark" :size="14" /> All bookings</li>
-            <li><Icon name="heart" :size="14" /> Favorite places</li>
-          </ul>
-          <label class="modal-confirm">
-            <span>Type <strong>DELETE</strong> to confirm</span>
-            <input v-model="deleteConfirmText" type="text" placeholder="DELETE" autocomplete="off" />
-          </label>
-        </div>
-
         <footer class="modal-footer">
-          <Button variant="outline" @click="closeDeleteModal">Cancel</Button>
-          <button
-            type="button"
-            class="btn danger"
-            :disabled="deleteConfirmText !== 'DELETE'"
-            @click="confirmDelete"
-          >
+          <Button variant="outline" @click="closeDeleteModal">{{ t('Cancel') }}</Button>
+          <Button variant="danger" @click="confirmDelete">
             <Icon name="trash" :size="15" />
-            Delete Account
-          </button>
+            {{ t('Delete Account') }}
+          </Button>
         </footer>
       </div>
     </div>
@@ -482,6 +443,15 @@ h2 {
   padding-top: 0.65rem;
   border-top: 1px solid rgba(var(--color-primary-rgb), 0.08);
   color: var(--color-muted);
+  font-size: var(--fs-small);
+}
+
+/* Warning text below the action row */
+.danger-warning {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(163, 58, 43, 0.18);
+  color: #a33a2b;
   font-size: var(--fs-small);
 }
 
@@ -674,9 +644,22 @@ select {
   gap: 0.6rem;
 }
 
+/* Neutral action: Log Out stays in the standard outline style */
+.logout-btn {
+  color: var(--color-primary);
+  border-color: rgba(var(--color-primary-rgb), 0.4);
+}
+
+.logout-btn:hover {
+  background: rgba(var(--color-primary-rgb), 0.06);
+  border-color: var(--color-primary);
+}
+
+/* Destructive action: clearly red/danger-styled */
 .danger-btn {
   color: #a33a2b;
-  border-color: rgba(163, 58, 43, 0.45);
+  border-color: #a33a2b;
+  background: rgba(163, 58, 43, 0.06);
 }
 
 .danger-btn:hover {
@@ -758,52 +741,6 @@ select {
   color: var(--color-primary);
 }
 
-.modal-body {
-  display: grid;
-  gap: 0.85rem;
-  padding: 1.15rem 1.25rem;
-}
-
-.modal-warning {
-  color: var(--color-muted);
-  font-size: var(--fs-body);
-}
-
-.modal-list {
-  display: grid;
-  gap: 0.45rem;
-  margin: 0;
-  padding: 0.75rem 0.9rem;
-  list-style: none;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.1);
-  border-radius: 10px;
-  background: rgba(var(--color-primary-rgb), 0.03);
-}
-
-.modal-list li {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--color-text);
-  font-size: var(--fs-body);
-}
-
-.modal-list svg {
-  color: var(--color-accent);
-  flex-shrink: 0;
-}
-
-.modal-confirm {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.modal-confirm > span {
-  color: var(--color-primary);
-  font-size: var(--fs-body);
-  font-weight: 600;
-}
-
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -813,20 +750,6 @@ select {
   border-top: 1px solid rgba(var(--color-primary-rgb), 0.08);
   background: rgba(var(--color-primary-rgb), 0.03);
   border-radius: 0 0 var(--radius) var(--radius);
-}
-
-.btn.danger {
-  background: #a33a2b;
-  color: var(--color-white);
-}
-
-.btn.danger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn.danger:not(:disabled):hover {
-  opacity: 0.9;
 }
 
 /* Responsive */

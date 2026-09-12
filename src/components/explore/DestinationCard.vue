@@ -3,6 +3,7 @@ import type { Destination } from '../../types/destination'
 import RatingDisplay from './RatingDisplay.vue'
 import Icon from '../common/Icon.vue'
 import { useFavorites } from '../../composables/useFavorites'
+import { t } from '../../composables/useLanguage'
 import { useRoute } from 'vue-router'
 
 defineProps<{
@@ -21,7 +22,7 @@ const route = useRoute()
         class="favorite-btn"
         type="button"
         :aria-pressed="isFavorite(destination.id)"
-        :aria-label="isFavorite(destination.id) ? 'Remove from favorites' : 'Add to favorites'"
+        :aria-label="isFavorite(destination.id) ? t('Remove from favorites') : t('Add to favorites')"
         @click="toggleFavorite(destination.id)"
       >
         <Icon :name="isFavorite(destination.id) ? 'heart-filled' : 'heart'" :size="18" />
@@ -39,7 +40,7 @@ const route = useRoute()
       <p class="card-description">{{ destination.description }}</p>
 
       <router-link :to="{ path: `/explore/${destination.id}`, query: { from: route.fullPath } }" class="card-btn">
-        View Details
+        {{ t('View Details') }}
       </router-link>
     </div>
   </div>
@@ -140,13 +141,17 @@ const route = useRoute()
 
 .card-btn {
   margin-top: 0.25rem;
-  align-self: flex-start;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: var(--color-primary);
   color: var(--color-white);
-  padding: 0.4rem 0.8rem;
+  padding: 0.5rem 0.8rem;
   border-radius: 8px;
   font-size: var(--fs-button);
   font-weight: 600;
+  text-align: center;
   transition: background 0.2s;
 }
 

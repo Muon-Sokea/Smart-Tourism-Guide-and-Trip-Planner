@@ -6,6 +6,7 @@ import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 import { destinations } from '../../data/destinations'
 import { categoryOptions } from '../../data/mockData/categories'
+import { t } from '../../composables/useLanguage'
 
 const router = useRouter()
 const heroSearch = ref('')
@@ -69,18 +70,18 @@ const categoryTiles = computed(() =>
 
 const features = [
   {
-    title: 'Discover',
-    description: 'Find interesting destinations around the world.',
+    title: t('Discover'),
+    description: t('Find interesting destinations around the world.'),
     icon: 'compass',
   },
   {
-    title: 'Plan',
-    description: 'Build a simple day-by-day trip itinerary.',
+    title: t('Plan'),
+    description: t('Build a simple day-by-day trip itinerary.'),
     icon: 'route',
   },
   {
-    title: 'Explore',
-    description: 'Search and filter destinations to find the right fit.',
+    title: t('Explore'),
+    description: t('Search and filter destinations to find the right fit.'),
     icon: 'map',
   },
 ]
@@ -96,7 +97,7 @@ const features = [
           :key="slide.id"
           class="hero-slide"
           :class="{ active: index === currentSlide }"
-          :style="{ backgroundImage: `url(${slide.image})` }"
+          :style="{ backgroundImage: `url('${slide.image}')` }"
         ></div>
         <div class="hero-overlay"></div>
       </div>
@@ -104,7 +105,7 @@ const features = [
       <button
         type="button"
         class="hero-arrow hero-arrow-prev"
-        aria-label="Previous slide"
+        :aria-label="t('Previous slide')"
         @click="prevSlide"
       >
         <Icon name="chevron-down" :size="20" />
@@ -112,21 +113,21 @@ const features = [
       <button
         type="button"
         class="hero-arrow hero-arrow-next"
-        aria-label="Next slide"
+        :aria-label="t('Next slide')"
         @click="nextSlide"
       >
         <Icon name="chevron-down" :size="20" />
       </button>
 
       <div class="container hero-inner">
-        <h1>Discover Your Next Adventure</h1>
-        <p>Explore amazing destinations and create your perfect trip.</p>
+        <h1>{{ t('Discover Your Next Adventure') }}</h1>
+        <p>{{ t('Explore amazing destinations and create your perfect trip.') }}</p>
 
         <form class="hero-search" @submit.prevent="submitHeroSearch">
           <label class="hero-field">
             <Icon name="compass" :size="16" />
             <select v-model="heroCategory">
-              <option value="All">All Categories</option>
+              <option value="All">{{ t('All Categories') }}</option>
               <option v-for="category in categoryOptions" :key="category.name" :value="category.name">
                 {{ category.name }}
               </option>
@@ -136,17 +137,17 @@ const features = [
 
           <label class="hero-field hero-field-grow">
             <Icon name="map-pin" :size="16" />
-            <input v-model="heroSearch" type="text" placeholder="Where do you want to go?" />
+            <input v-model="heroSearch" type="text" :placeholder="t('Where do you want to go?')" />
           </label>
 
-          <button type="submit" class="hero-search-btn" aria-label="Search destinations">
+          <button type="submit" class="hero-search-btn" :aria-label="t('Search destinations')">
             <Icon name="search" :size="18" />
           </button>
         </form>
 
         <Button to="/explore" variant="accent" class="hero-explore-btn">
           <Icon name="compass" :size="16" />
-          Explore Destinations
+          {{ t('Explore Destinations') }}
         </Button>
       </div>
 
@@ -158,7 +159,7 @@ const features = [
           class="hero-dot"
           :class="{ active: index === currentSlide }"
           :aria-current="index === currentSlide"
-          :aria-label="`Go to slide ${index + 1}: ${slide.name}`"
+          :aria-label="t('Go to slide {index}: {name}', { index: index + 1, name: slide.name })"
           @click="goToSlide(index)"
         ></button>
       </div>
@@ -167,8 +168,8 @@ const features = [
     <!-- Tour Categories -->
     <section class="section">
       <div class="container">
-        <p class="eyebrow">Find Your Perfect Experience</p>
-        <h2 class="section-title">Tour Categories</h2>
+        <p class="eyebrow">{{ t('Find Your Perfect Experience') }}</p>
+        <h2 class="section-title">{{ t('Tour Categories') }}</h2>
 
         <div class="category-row">
           <router-link
@@ -188,8 +189,8 @@ const features = [
     <!-- Most Popular Tour -->
     <section class="section section-alt">
       <div class="container">
-        <p class="eyebrow">Top places travelers love</p>
-        <h2 class="section-title">Popular Destinations</h2>
+        <p class="eyebrow">{{ t('Top places travelers love') }}</p>
+        <h2 class="section-title">{{ t('Popular Destinations') }}</h2>
         <DestinationGrid :destinations="popularDestinations" />
       </div>
     </section>
@@ -197,7 +198,7 @@ const features = [
     <!-- Why TravelGo -->
     <section class="section">
       <div class="container">
-        <h2 class="section-title">Why TravelGo?</h2>
+        <h2 class="section-title">{{ t('Why TravelGo?') }}</h2>
         <div class="feature-grid">
           <div v-for="feature in features" :key="feature.title" class="feature-card">
             <span class="feature-icon"><Icon :name="feature.icon" :size="28" /></span>

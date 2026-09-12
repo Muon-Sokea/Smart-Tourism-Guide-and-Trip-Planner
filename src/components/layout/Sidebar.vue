@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Icon from '../common/Icon.vue'
+import { t } from '../../composables/useLanguage'
 import { appNavigation } from '../../data/appNavigation'
 
 const route = useRoute()
@@ -27,9 +28,9 @@ const currentSection = computed(() => {
 
 <template>
   <aside class="sidebar" :class="{ open }">
-    <nav class="sidebar-nav" aria-label="TravelGo application">
+    <nav class="sidebar-nav" :aria-label="t('TravelGo application')">
       <div v-for="group in appNavigation" :key="group.label" class="sidebar-group">
-        <p class="sidebar-label">{{ group.label }}</p>
+        <p class="sidebar-label">{{ t(group.label) }}</p>
         <router-link
           v-for="item in group.items"
           :key="item.to"
@@ -38,7 +39,7 @@ const currentSection = computed(() => {
           :class="{ active: isActive(item.to), 'section-active': currentSection === group.label }"
         >
           <Icon :name="item.icon" :size="17" />
-          <span>{{ item.label }}</span>
+          <span>{{ t(item.label) }}</span>
         </router-link>
       </div>
     </nav>

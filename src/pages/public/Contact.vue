@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import Icon from '../../components/common/Icon.vue'
 import Button from '../../components/common/Button.vue'
+import { t } from '../../composables/useLanguage'
 
-const contactDetails = [
-  { label: 'Email', value: 'hello@travelgo.example', icon: 'mail' },
-  { label: 'Phone', value: '+1 (555) 010-2024', icon: 'user' },
-  { label: 'Office', value: '123 Journey Street, Phnom Penh, Cambodia', icon: 'map-pin' },
-]
+const contactDetails = computed(() => [
+  { label: t('Email'), value: 'hello@travelgo.example', icon: 'mail' },
+  { label: t('Phone'), value: '+1 (555) 010-2024', icon: 'user' },
+  { label: t('Office'), value: '123 Journey Street, Phnom Penh, Cambodia', icon: 'map-pin' },
+])
 
 const name = ref('')
 const email = ref('')
@@ -17,7 +18,7 @@ const isSubmitted = ref(false)
 
 function handleSubmit() {
   if (!name.value.trim() || !email.value.trim() || !message.value.trim()) {
-    errorMessage.value = 'Please fill in every field.'
+    errorMessage.value = t('Please fill in every field.')
     return
   }
 
@@ -34,8 +35,8 @@ function handleSubmit() {
   <div class="contact">
     <div class="container">
       <header class="page-header">
-        <h1>Contact Us</h1>
-        <p>Questions about a trip or destination? Send us a message.</p>
+        <h1>{{ t('Contact Us') }}</h1>
+        <p>{{ t('Questions about a trip or destination? Send us a message.') }}</p>
       </header>
 
       <div class="contact-layout">
@@ -52,27 +53,27 @@ function handleSubmit() {
         <form class="contact-form" @submit.prevent="handleSubmit">
           <p v-if="isSubmitted" class="success-message">
             <Icon name="check" :size="16" />
-            Thanks! Your message has been sent.
+            {{ t('Thanks! Your message has been sent.') }}
           </p>
 
           <label class="field">
-            <span>Name</span>
-            <input v-model="name" type="text" placeholder="Your name" />
+            <span>{{ t('Name') }}</span>
+            <input v-model="name" type="text" :placeholder="t('Your name')" />
           </label>
 
           <label class="field">
-            <span>Email</span>
+            <span>{{ t('Email') }}</span>
             <input v-model="email" type="email" placeholder="you@example.com" />
           </label>
 
           <label class="field">
-            <span>Message</span>
-            <textarea v-model="message" rows="5" placeholder="How can we help?"></textarea>
+            <span>{{ t('Message') }}</span>
+            <textarea v-model="message" rows="5" :placeholder="t('How can we help?')"></textarea>
           </label>
 
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
-          <Button variant="primary" type="submit">Send Message</Button>
+          <Button variant="primary" type="submit">{{ t('Send Message') }}</Button>
         </form>
       </div>
     </div>

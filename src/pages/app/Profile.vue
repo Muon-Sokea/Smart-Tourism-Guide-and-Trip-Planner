@@ -9,6 +9,7 @@ import { destinations } from '../../data/destinations'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 import type { Trip } from '../../types/trip'
+import { t, dateLocale } from '../../composables/useLanguage'
 import type { Booking } from '../../types/booking'
 
 const router = useRouter()
@@ -31,9 +32,9 @@ const favoriteDestinations = computed(() =>
 
 // Simple travel-focused stats derived from existing app state.
 const stats = computed(() => [
-  { label: 'Total Trips', value: trips.value.length, icon: 'route' },
-  { label: 'Total Bookings', value: bookings.value.length, icon: 'bookmark' },
-  { label: 'Places Visited', value: favoriteIds.value.length, icon: 'map-pin' },
+  { label: t('Total Trips'), value: trips.value.length, icon: 'route' },
+  { label: t('Total Bookings'), value: bookings.value.length, icon: 'bookmark' },
+  { label: t('Places Visited'), value: favoriteIds.value.length, icon: 'map-pin' },
 ])
 
 /* ---------- 1. Profile header + edit ---------- */
@@ -69,17 +70,17 @@ function initials(name?: string): string {
 /* ---------- Formatting helpers (same conventions as MyTrips/MyBookings) ---------- */
 function formatDate(dateStr?: string): string {
   if (!dateStr) return '—'
-  return new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric' }).format(
+  return new Intl.DateTimeFormat(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(
     new Date(`${dateStr}T00:00:00`)
   )
 }
 
 function tripStatus(tripData: Trip): string {
   const today = new Date().toISOString().slice(0, 10)
-  if (!tripData.startDate) return 'Planned'
-  if (tripData.endDate && tripData.endDate < today) return 'Completed'
-  if (tripData.startDate > today) return 'Upcoming'
-  return 'In Progress'
+  if (!tripData.startDate) return t('Planned')
+  if (tripData.endDate && tripData.endDate < today) return t('Completed')
+  if (tripData.startDate > today) return t('Upcoming')
+  return t('In Progress')
 }
 
 function statusClass(tripData: Trip): string {
@@ -110,40 +111,40 @@ function handleLogout() {
             <span>{{ initials(user?.name) }}</span>
           </div>
           <div class="profile-info">
-            <h1>{{ user?.name || 'Travel Explorer' }}</h1>
+            <h1>{{ user?.name || t('Travel Explorer') }}</h1>
             <p class="profile-meta">
               <span><Icon name="mail" :size="14" /> {{ user?.email || '—' }}</span>
               <span v-if="user?.location"><Icon name="map-pin" :size="14" /> {{ user.location }}</span>
             </p>
-            <p class="profile-bio">{{ user?.bio || 'No bio yet — tell us about your travel style.' }}</p>
+            <p class="profile-bio">{{ user?.bio || t('No bio yet — tell us about your travel style.') }}</p>
           </div>
           <div class="profile-actions">
             <Button variant="outline" @click="startEdit">
               <Icon name="edit" :size="15" />
-              Edit Profile
+              {{ t('Edit Profile') }}
             </Button>
           </div>
         </div>
 
         <form v-else class="profile-edit" @submit.prevent="saveProfile">
           <label>
-            Name
+            {{ t('Name') }}
             <input v-model="form.name" type="text" required />
           </label>
           <label>
-            Location
-            <input v-model="form.location" type="text" placeholder="e.g. Phnom Penh, Cambodia" />
+            {{ t('Location') }}
+            <input v-model="form.location" type="text" :placeholder="t('e.g. Phnom Penh, Cambodia')" />
           </label>
           <label class="bio-field">
-            Short bio
-            <textarea v-model="form.bio" rows="2" placeholder="A line or two about your travel style"></textarea>
+            {{ t('Short bio') }}
+            <textarea v-model="form.bio" rows="2" :placeholder="t('A line or two about your travel style')"></textarea>
           </label>
           <div class="edit-actions">
             <Button variant="primary" type="submit">
               <Icon name="check" :size="15" />
-              Save Changes
+              {{ t('Save Changes') }}
             </Button>
-            <Button variant="outline" @click="isEditing = false">Cancel</Button>
+            <Button variant="outline" @click="isEditing = false">{{ t('Cancel') }}</Button>
           </div>
         </form>
       </section>
@@ -162,9 +163,9 @@ function handleLogout() {
       <!-- 3. My Trips preview -->
       <section class="preview-section">
         <div class="section-head">
-          <h2>My Trips</h2>
+          <h2>{{ t('My Trips') }}</h2>
           <Button to="/trips" variant="outline">
-            View All Trips
+            {{ t('View All Trips') }}
             <Icon name="arrow-right" :size="14" />
           </Button>
         </div>
@@ -177,31 +178,31 @@ function handleLogout() {
             </div>
             <p class="trip-destination">
               <Icon name="map-pin" :size="14" />
-              {{ tripItem.destination || 'No destination set' }}
+              {{ tripItem.destination || t('No destination set') }}
             </p>
             <div class="trip-meta">
               <span><Icon name="calendar" :size="14" /> {{ formatDate(tripItem.startDate) }}</span>
-              <span><Icon name="clock" :size="14" /> {{ tripItem.days }} days</span>
-              <span><Icon name="map-pin" :size="14" /> {{ tripItem.items.length }} places</span>
+              <span><Icon name="clock" :size="14" /> {{ t('{n} days', { n: tripItem.days }) }}</span>
+              <span><Icon name="map-pin" :size="14" /> {{ t('{n} places', { n: tripItem.items.length }) }}</span>
             </div>
           </div>
         </div>
         <div v-else class="mini-empty">
           <Icon name="route" :size="28" />
           <div>
-            <p class="mini-empty-title">No trips yet</p>
-            <p class="mini-empty-sub">Plan your first journey with the Trip Planner.</p>
+            <p class="mini-empty-title">{{ t('No trips yet') }}</p>
+            <p class="mini-empty-sub">{{ t('Plan your first journey with the Trip Planner.') }}</p>
           </div>
-          <Button to="/trip-planner" variant="accent">Plan a Trip</Button>
+          <Button to="/trip-planner" variant="accent">{{ t('Plan a Trip') }}</Button>
         </div>
       </section>
 
       <!-- 4. Recent Bookings preview -->
       <section class="preview-section">
         <div class="section-head">
-          <h2>Recent Bookings</h2>
+          <h2>{{ t('Recent Bookings') }}</h2>
           <Button to="/bookings" variant="outline">
-            View All Bookings
+            {{ t('View All Bookings') }}
             <Icon name="arrow-right" :size="14" />
           </Button>
         </div>
@@ -214,26 +215,26 @@ function handleLogout() {
             </div>
             <div class="booking-meta">
               <span class="booking-price">${{ booking.totalPrice }}</span>
-              <span class="status-badge" :class="statusClassForBooking(booking)">{{ booking.status }}</span>
+              <span class="status-badge" :class="statusClassForBooking(booking)">{{ t(booking.status) }}</span>
             </div>
           </div>
         </div>
         <div v-else class="mini-empty">
           <Icon name="bookmark" :size="28" />
           <div>
-            <p class="mini-empty-title">No bookings yet</p>
-            <p class="mini-empty-sub">Book hotels, restaurants, and activities in Explore.</p>
+            <p class="mini-empty-title">{{ t('No bookings yet') }}</p>
+            <p class="mini-empty-sub">{{ t('Book hotels, restaurants, and activities in Explore.') }}</p>
           </div>
-          <Button to="/explore" variant="accent">Explore Services</Button>
+          <Button to="/explore" variant="accent">{{ t('Explore Services') }}</Button>
         </div>
       </section>
 
       <!-- 5. Saved Places preview -->
       <section class="preview-section">
         <div class="section-head">
-          <h2>Saved Places</h2>
+          <h2>{{ t('Saved Places') }}</h2>
           <Button to="/favorites" variant="outline">
-            View All
+            {{ t('View All') }}
             <Icon name="arrow-right" :size="14" />
           </Button>
         </div>
@@ -258,24 +259,24 @@ function handleLogout() {
         <div v-else class="mini-empty">
           <Icon name="heart" :size="28" />
           <div>
-            <p class="mini-empty-title">No saved places yet</p>
-            <p class="mini-empty-sub">Tap the heart on destinations to save them here.</p>
+            <p class="mini-empty-title">{{ t('No saved places yet') }}</p>
+            <p class="mini-empty-sub">{{ t('Tap the heart on destinations to save them here.') }}</p>
           </div>
-          <Button to="/explore" variant="accent">Explore Destinations</Button>
+          <Button to="/explore" variant="accent">{{ t('Explore Destinations') }}</Button>
         </div>
       </section>
 
       <!-- 6. Account -->
       <section class="account-card">
-        <h2>Account</h2>
+        <h2>{{ t('Account') }}</h2>
         <div class="account-actions">
           <Button to="/settings" variant="outline">
             <Icon name="settings" :size="15" />
-            Settings
+            {{ t('Settings') }}
           </Button>
           <Button variant="outline" @click="handleLogout">
             <Icon name="log-out" :size="15" />
-            Log Out
+            {{ t('Log Out') }}
           </Button>
         </div>
       </section>

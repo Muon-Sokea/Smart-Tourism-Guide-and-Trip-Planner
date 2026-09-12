@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import type { ItineraryItem } from '../../types/trip'
 import type { ResolvedPlace } from '../../composables/useTripPlanner'
 import Icon from '../common/Icon.vue'
+import { t } from '../../composables/useLanguage'
 
 const props = defineProps<{
   item: ItineraryItem
@@ -42,20 +43,20 @@ function setTime(event: Event) {
 
       <div class="timeline-card">
         <div class="timeline-card-main">
-          <span v-if="place" class="place-kind">{{ place.kindLabel }}</span>
+          <span v-if="place" class="place-kind">{{ t(place.kindLabel) }}</span>
           <h3>
             <Icon name="map-pin" :size="16" />
-            {{ place?.name ?? 'Unknown place' }}
+            {{ place?.name ?? t('Unknown place') }}
           </h3>
-          <p v-if="place">{{ place.country }} · Visit for {{ item.durationLabel }}</p>
+          <p v-if="place">{{ place.country }} · {{ t('Visit for {duration}', { duration: item.durationLabel }) }}</p>
           <div class="timeline-edit">
             <label>
-              Day
+              {{ t('Day') }}
               <select :value="item.day" @change="setDay">
-                <option v-for="day in dayOptions" :key="day" :value="day">Day {{ day }}</option>
+                <option v-for="day in dayOptions" :key="day" :value="day">{{ t('Day {day}', { day }) }}</option>
               </select>
             </label>
-            <label>Time <input :value="item.time" type="time" @change="setTime" /></label>
+            <label>{{ t('Time') }} <input :value="item.time" type="time" @change="setTime" /></label>
           </div>
         </div>
 
@@ -63,7 +64,7 @@ function setTime(event: Event) {
           <button
             class="move-btn"
             type="button"
-            aria-label="Move earlier"
+            :aria-label="t('Move earlier')"
             @click="emit('move', { id: item.id, direction: 'up' })"
           >
             <Icon name="arrow-up" :size="15" />
@@ -71,7 +72,7 @@ function setTime(event: Event) {
           <button
             class="move-btn"
             type="button"
-            aria-label="Move later"
+            :aria-label="t('Move later')"
             @click="emit('move', { id: item.id, direction: 'down' })"
           >
             <Icon name="arrow-down" :size="15" />
@@ -79,7 +80,7 @@ function setTime(event: Event) {
           <button
             class="remove-btn"
             type="button"
-            aria-label="Remove from itinerary"
+            :aria-label="t('Remove from itinerary')"
             @click="emit('remove', item.id)"
           >
             <Icon name="trash" :size="16" />

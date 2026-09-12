@@ -5,6 +5,7 @@ import { destinations } from '../../data/destinations'
 import { useFavorites } from '../../composables/useFavorites'
 import { useTripPlanner } from '../../composables/useTripPlanner'
 import { backLabelFor, useNavHistory } from '../../composables/useNavHistory'
+import { t } from '../../composables/useLanguage'
 import RatingDisplay from '../../components/explore/RatingDisplay.vue'
 import DestinationGrid from '../../components/explore/DestinationGrid.vue'
 import Button from '../../components/common/Button.vue'
@@ -57,7 +58,7 @@ function handleAddToTrip() {
           class="favorite-btn"
           type="button"
           :aria-pressed="isFavorite(destination.id)"
-          :aria-label="isFavorite(destination.id) ? 'Remove from favorites' : 'Add to favorites'"
+          :aria-label="isFavorite(destination.id) ? t('Remove from favorites') : t('Add to favorites')"
           @click="toggleFavorite(destination.id)"
         >
           <Icon :name="isFavorite(destination.id) ? 'heart-filled' : 'heart'" :size="22" />
@@ -74,11 +75,11 @@ function handleAddToTrip() {
         <div class="details-actions">
           <Button variant="outline" @click="toggleFavorite(destination.id)">
             <Icon :name="isFavorite(destination.id) ? 'heart-filled' : 'heart'" :size="16" />
-            {{ isFavorite(destination.id) ? 'Remove from Favorites' : 'Add to Favorites' }}
+            {{ isFavorite(destination.id) ? t('Remove from Favorites') : t('Add to Favorites') }}
           </Button>
           <Button variant="primary" :disabled="isInTrip" @click="handleAddToTrip">
             <Icon :name="isInTrip ? 'check' : 'plus'" :size="16" />
-            {{ isInTrip ? 'Added to Trip' : 'Add to Trip' }}
+            {{ isInTrip ? t('Added to Trip') : t('Add to Trip') }}
           </Button>
         </div>
         <p v-if="lastAddedMessage" class="trip-added-note" role="status">{{ lastAddedMessage }}</p>
@@ -86,37 +87,37 @@ function handleAddToTrip() {
 
       <!-- About Section -->
       <section class="details-section">
-        <h2>About This Destination</h2>
+        <h2>{{ t('About This Destination') }}</h2>
         <p>{{ destination.description }}</p>
       </section>
 
       <!-- Destination Information -->
       <section class="info-grid">
         <div class="info-card">
-          <span class="info-label">Country</span>
+          <span class="info-label">{{ t('Country') }}</span>
           <span class="info-value">{{ destination.country }}</span>
         </div>
         <div class="info-card">
-          <span class="info-label">Category</span>
+          <span class="info-label">{{ t('Category') }}</span>
           <span class="info-value">{{ destination.category }}</span>
         </div>
         <div class="info-card">
-          <span class="info-label">Rating</span>
+          <span class="info-label">{{ t('Rating') }}</span>
           <span class="info-value"><RatingDisplay :rating="destination.rating" /></span>
         </div>
         <div class="info-card">
-          <span class="info-label">Best Time</span>
+          <span class="info-label">{{ t('Best Time') }}</span>
           <span class="info-value">{{ destination.bestTime }}</span>
         </div>
         <div class="info-card">
-          <span class="info-label">Estimated Cost</span>
+          <span class="info-label">{{ t('Estimated Cost') }}</span>
           <span class="info-value">{{ destination.estimatedCost }}</span>
         </div>
       </section>
 
       <!-- Highlights -->
       <section class="details-section">
-        <h2>Highlights</h2>
+        <h2>{{ t('Highlights') }}</h2>
         <div class="highlight-grid">
           <div v-for="highlight in destination.highlights" :key="highlight" class="highlight-card">
             <span class="highlight-icon"><Icon name="check" :size="18" /></span>
@@ -127,7 +128,7 @@ function handleAddToTrip() {
 
       <!-- Nearby Destinations -->
       <section v-if="nearbyDestinations.length" class="details-section">
-        <h2>Nearby Destinations</h2>
+        <h2>{{ t('Nearby Destinations') }}</h2>
         <DestinationGrid :destinations="nearbyDestinations" />
       </section>
 
@@ -135,7 +136,7 @@ function handleAddToTrip() {
       <section class="route-section">
           <Button :to="`/map?destination=${destination.id}`" variant="outline">
           <Icon name="route" :size="16" />
-          View Route
+          {{ t('View Route') }}
         </Button>
       </section>
     </div>
@@ -143,7 +144,7 @@ function handleAddToTrip() {
 
   <div class="details-not-found" v-else>
     <div class="container">
-      <p>Destination not found.</p>
+      <p>{{ t('Destination not found.') }}</p>
       <router-link :to="backTarget" class="back-link" @click.prevent="goBack()">
         <Icon name="arrow-left" :size="16" />
         {{ backLabel }}

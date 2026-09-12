@@ -17,6 +17,15 @@ body {
   color: var(--color-text);
 }
 
+/* Khmer UI text gets a proper Khmer face; Latin keeps Poppins. */
+html[lang='km'] body {
+  font-family: "Noto Sans Khmer", "Poppins", "Segoe UI", system-ui, sans-serif;
+}
+
+html[lang='km'] body {
+  line-height: 1.65;
+}
+
 a {
   text-decoration: none;
   color: inherit;

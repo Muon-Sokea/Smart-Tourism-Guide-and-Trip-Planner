@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import { navLinks } from '../../data/navLinks'
+import { t } from '../../composables/useLanguage'
 </script>
 
 <template>
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <h3>TravelGo</h3>
-        <p>Discover interesting places and plan your next journey with ease.</p>
+        <h3>
+          <img src="/travelgo-mark.svg" alt="" class="footer-brand-mark" />
+          TravelGo
+        </h3>
+        <p>{{ t('Discover interesting places and plan your next journey with ease.') }}</p>
       </div>
 
       <div class="footer-links">
         <router-link v-for="link in navLinks" :key="link.to" :to="link.to">
-          {{ link.label }}
+          {{ t(link.label) }}
         </router-link>
       </div>
     </div>
 
-    <p class="footer-copyright">&copy; 2026 TravelGo. All rights reserved.</p>
+    <p class="footer-copyright">{{ t('&copy; 2026 TravelGo. All rights reserved.') }}</p>
   </footer>
 </template>
 
@@ -37,8 +41,17 @@ import { navLinks } from '../../data/navLinks'
 }
 
 .footer-brand h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 0 0 0.4rem;
   color: var(--color-accent);
+}
+
+.footer-brand-mark {
+  width: 26px;
+  height: 28px;
+  object-fit: contain;
 }
 
 .footer-brand p {

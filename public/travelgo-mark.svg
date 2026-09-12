@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 132" role="img" aria-label="TravelGo">
+  <!-- Location pin -->
+  <path fill="#1b4332" d="M60 4C30 4 12 26 12 52c0 28 28 56 48 76 20-20 48-48 48-76C108 26 90 4 60 4Z"/>
+  <!-- Sun -->
+  <circle cx="60" cy="56" r="18" fill="#d4a017"/>
+  <!-- Temple silhouette (knockout) -->
+  <g fill="#ffffff">
+    <path d="M60 22l3.5 10v6h3v7h3v7h-19v-7h3v-7h3v-6L60 22Z"/>
+    <path d="M42 34l3 8v5h2.5v5h-11v-5H39v-5l3-8Z"/>
+    <path d="M78 34l3 8v5h2.5v5h-11v-5H75v-5l3-8Z"/>
+    <path d="M26 56h68v6H26z"/>
+  </g>
+  <!-- Road to the tip -->
+  <path d="M63 63c-8 11 7 19-3 32-5 7-2 17 0 27" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  <!-- Gold swoosh -->
+  <path fill="#d4a017" d="M14 58c6 20 26 34 48 36-22 4-46-8-52-28-2-6 0-10 4-8Z"/>
+  <!-- Plane taking off -->
+  <g transform="translate(88 14) rotate(45)">
+    <path fill="#d4a017" d="M0-13c1.5 0 2.5 3 2.5 6v4L13 3v3.5L2.5 3.5V8L6 11v2.5L0 12l-6 1.5V11l3.5-3V3.5L-13 6.5V3L-2.5-3v-4c0-3 1-6 2.5-6Z"/>
+  </g>
+</svg>

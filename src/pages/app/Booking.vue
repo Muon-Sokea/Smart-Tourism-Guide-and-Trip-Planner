@@ -5,6 +5,7 @@ import { findService, priceNumber, serviceAvailability, serviceLabel } from '../
 import { useBookings } from '../../composables/useBookings'
 import { useTripPlanner } from '../../composables/useTripPlanner'
 import { backLabelFor, useNavHistory } from '../../composables/useNavHistory'
+import { t, dateLocale } from '../../composables/useLanguage'
 import type { Booking } from '../../types/booking'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
@@ -27,20 +28,20 @@ const today = new Date().toISOString().slice(0, 10)
 const price = computed(() => service.value ? priceNumber(service.value) : 0)
 const nights = computed(() => form.startDate && form.endDate ? Math.max(0, Math.round((new Date(`${form.endDate}T00:00:00`).getTime() - new Date(`${form.startDate}T00:00:00`).getTime()) / 86400000)) : 0)
 const total = computed(() => serviceType.value === 'hotel' ? price.value * nights.value * form.numberOfRooms : serviceType.value === 'activity' ? price.value * form.participants : 0)
-const formTitle = computed(() => serviceType.value === 'restaurant' ? 'Restaurant Reservation' : `${serviceLabel(serviceType.value)} Booking`)
+const formTitle = computed(() => serviceType.value === 'restaurant' ? t('Restaurant Reservation') : `${t(serviceLabel(serviceType.value))} ${t('Booking')}`)
 
 function validate() {
   error.value = ''
-  if (!service.value || serviceAvailability(service.value) === 'Not Available') { error.value = 'This service is not available for booking.'; return false }
+  if (!service.value || serviceAvailability(service.value) === 'Not Available') { error.value = t('This service is not available for booking.'); return false }
   if (serviceType.value === 'hotel') {
-    if (!form.startDate || !form.endDate) error.value = 'Check-in and check-out dates are required.'
-    else if (form.endDate <= form.startDate) error.value = 'Check-out must be after check-in.'
-    else if (form.guests < 1 || form.numberOfRooms < 1) error.value = 'Guests and rooms must be greater than 0.'
+    if (!form.startDate || !form.endDate) error.value = t('Check-in and check-out dates are required.')
+    else if (form.endDate <= form.startDate) error.value = t('Check-out must be after check-in.')
+    else if (form.guests < 1 || form.numberOfRooms < 1) error.value = t('Guests and rooms must be greater than 0.')
   } else if (serviceType.value === 'restaurant') {
-    if (!form.date || !form.time) error.value = 'Date and time are required.'
-    else if (form.guests < 1) error.value = 'Guests must be greater than 0.'
-  } else if (!form.date || !form.time) error.value = 'Date and time are required.'
-  else if (form.participants < 1) error.value = 'Participants must be greater than 0.'
+    if (!form.date || !form.time) error.value = t('Date and time are required.')
+    else if (form.guests < 1) error.value = t('Guests must be greater than 0.')
+  } else if (!form.date || !form.time) error.value = t('Date and time are required.')
+  else if (form.participants < 1) error.value = t('Participants must be greater than 0.')
   return !error.value
 }
 
@@ -60,7 +61,7 @@ function confirmBooking() {
 }
 
 function formatDate(value?: string) {
-  return value ? new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`)) : 'Not set'
+  return value ? new Intl.DateTimeFormat(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${value}T00:00:00`)) : t('Not set')
 }
 
 /* The router reuses this component when the user jumps from one service's
@@ -82,44 +83,44 @@ watch(service, () => {
 <template>
   <div class="booking-page">
     <div class="container">
-      <router-link :to="backTarget" class="back-link" @click.prevent="goBack()"><Icon name="arrow-left" :size="16" /> {{ backLabel }}</router-link>
+      <router-link :to="backTarget" class="back-link" @click.prevent="goBack()"><Icon name="arrow-left" :size="16" /> {{ t(backLabel) }}</router-link>
       <div v-if="service" class="booking-layout">
         <main class="booking-main">
-          <p class="eyebrow">TravelGo booking</p>
-          <h1>{{ step === 'confirmed' ? 'Booking Confirmed' : formTitle }}</h1>
+          <p class="eyebrow">{{ t('TravelGo booking') }}</p>
+          <h1>{{ step === 'confirmed' ? t('Booking Confirmed') : formTitle }}</h1>
           <p class="booking-subtitle">{{ service.name }} · {{ service.location }}</p>
 
           <section v-if="step === 'form'" class="form-card">
             <div v-if="serviceType === 'hotel'" class="form-grid">
-              <label>Check-in<input v-model="form.startDate" type="date" :min="today" /></label>
-              <label>Check-out<input v-model="form.endDate" type="date" :min="form.startDate || today" /></label>
-              <label>Guests<input v-model.number="form.guests" type="number" min="1" /></label>
-              <label>Room Type<select v-model="form.roomType"><option>Standard Room</option><option>Deluxe Room</option><option>Family Room</option></select></label>
-              <label>Number of Rooms<input v-model.number="form.numberOfRooms" type="number" min="1" /></label>
+              <label>{{ t('Check-in') }}<input v-model="form.startDate" type="date" :min="today" /></label>
+              <label>{{ t('Check-out') }}<input v-model="form.endDate" type="date" :min="form.startDate || today" /></label>
+              <label>{{ t('Guests') }}<input v-model.number="form.guests" type="number" min="1" /></label>
+              <label>{{ t('Room Type') }}<select v-model="form.roomType"><option>{{ t('Standard Room') }}</option><option>{{ t('Deluxe Room') }}</option><option>{{ t('Family Room') }}</option></select></label>
+              <label>{{ t('Number of Rooms') }}<input v-model.number="form.numberOfRooms" type="number" min="1" /></label>
             </div>
             <div v-else class="form-grid">
-              <label>Date<input v-model="form.date" type="date" :min="today" /></label>
-              <label>Time<input v-model="form.time" type="time" /></label>
-              <label v-if="serviceType === 'restaurant'">Guests<input v-model.number="form.guests" type="number" min="1" /></label>
-              <label v-else>Participants<input v-model.number="form.participants" type="number" min="1" /></label>
-              <label v-if="serviceType === 'restaurant'" class="wide">Special Request<textarea v-model="form.specialRequest" rows="3" placeholder="Optional"></textarea></label>
+              <label>{{ t('Date') }}<input v-model="form.date" type="date" :min="today" /></label>
+              <label>{{ t('Time') }}<input v-model="form.time" type="time" /></label>
+              <label v-if="serviceType === 'restaurant'">{{ t('Guests') }}<input v-model.number="form.guests" type="number" min="1" /></label>
+              <label v-else>{{ t('Participants') }}<input v-model.number="form.participants" type="number" min="1" /></label>
+              <label v-if="serviceType === 'restaurant'" class="wide">{{ t('Special Request') }}<textarea v-model="form.specialRequest" rows="3" :placeholder="t('Optional')"></textarea></label>
             </div>
             <p v-if="error" class="form-error" role="alert">{{ error }}</p>
-            <Button variant="accent" @click="continueToReview">Continue</Button>
+            <Button variant="accent" @click="continueToReview">{{ t('Continue') }}</Button>
           </section>
 
           <section v-else-if="step === 'review'" class="form-card review-card">
-            <h2>Review Booking</h2>
-            <dl><div><dt>Service</dt><dd>{{ service.name }}</dd></div><div v-if="serviceType === 'hotel'"><dt>Stay</dt><dd>{{ formatDate(form.startDate) }} → {{ formatDate(form.endDate) }}</dd></div><div v-else><dt>Date and time</dt><dd>{{ formatDate(form.date) }} · {{ form.time }}</dd></div><div><dt>{{ serviceType === 'hotel' || serviceType === 'restaurant' ? 'Guests' : 'Participants' }}</dt><dd>{{ serviceType === 'activity' ? form.participants : form.guests }}</dd></div><div v-if="serviceType === 'hotel'"><dt>Room</dt><dd>{{ form.roomType }} · {{ form.numberOfRooms }} room(s)</dd></div><div v-if="serviceType === 'restaurant' && form.specialRequest"><dt>Request</dt><dd>{{ form.specialRequest }}</dd></div></dl>
-            <div class="review-total"><span>{{ serviceType === 'restaurant' ? 'Payment' : 'Estimated Total' }}</span><strong>{{ serviceType === 'restaurant' ? 'Pay at Service / Demo Booking' : `$${total}` }}</strong></div>
-            <div class="review-actions"><Button variant="outline" @click="step = 'form'">Back</Button><Button variant="accent" @click="confirmBooking">Confirm Booking</Button></div>
+            <h2>{{ t('Review Booking') }}</h2>
+            <dl><div><dt>{{ t('Service') }}</dt><dd>{{ service.name }}</dd></div><div v-if="serviceType === 'hotel'"><dt>{{ t('Stay') }}</dt><dd>{{ formatDate(form.startDate) }} → {{ formatDate(form.endDate) }}</dd></div><div v-else><dt>{{ t('Date and time') }}</dt><dd>{{ formatDate(form.date) }} · {{ form.time }}</dd></div><div><dt>{{ serviceType === 'hotel' || serviceType === 'restaurant' ? t('Guests') : t('Participants') }}</dt><dd>{{ serviceType === 'activity' ? form.participants : form.guests }}</dd></div><div v-if="serviceType === 'hotel'"><dt>{{ t('Room') }}</dt><dd>{{ form.roomType }} · {{ form.numberOfRooms }} {{ t('room(s)') }}</dd></div><div v-if="serviceType === 'restaurant' && form.specialRequest"><dt>{{ t('Request') }}</dt><dd>{{ form.specialRequest }}</dd></div></dl>
+            <div class="review-total"><span>{{ serviceType === 'restaurant' ? t('Payment') : t('Estimated Total') }}</span><strong>{{ serviceType === 'restaurant' ? t('Pay at Service / Demo Booking') : `$${total}` }}</strong></div>
+            <div class="review-actions"><Button variant="outline" @click="step = 'form'">{{ t('Back') }}</Button><Button variant="accent" @click="confirmBooking">{{ t('Confirm Booking') }}</Button></div>
           </section>
 
-          <section v-else class="confirmation-card"><div class="confirmation-icon"><Icon name="check" :size="25" /></div><h2>Your booking has been successfully created.</h2><p>{{ service.name }}</p><strong>{{ booking?.id }}</strong><span>{{ booking?.status }} · {{ serviceType === 'hotel' ? `${formatDate(booking?.startDate)} → ${formatDate(booking?.endDate)}` : formatDate(booking?.date) }}</span><strong v-if="booking?.totalPrice">Total ${{ booking.totalPrice }}</strong><div class="review-actions"><Button to="/bookings" variant="accent">View My Bookings</Button><Button to="/trip-planner" variant="outline">View My Trip</Button></div></section>
+          <section v-else class="confirmation-card"><div class="confirmation-icon"><Icon name="check" :size="25" /></div><h2>{{ t('Your booking has been successfully created.') }}</h2><p>{{ service.name }}</p><strong>{{ booking?.id }}</strong><span>{{ t(booking?.status || '') }} · {{ serviceType === 'hotel' ? `${formatDate(booking?.startDate)} → ${formatDate(booking?.endDate)}` : formatDate(booking?.date) }}</span><strong v-if="booking?.totalPrice">{{ t('Total') }} ${{ booking.totalPrice }}</strong><div class="review-actions"><Button to="/bookings" variant="accent">{{ t('View My Bookings') }}</Button><Button to="/trip-planner" variant="outline">{{ t('View My Trip') }}</Button></div></section>
         </main>
-        <aside class="service-summary"><img :src="service.image" :alt="service.name" /><div><p class="eyebrow">Your selection</p><h2>{{ service.name }}</h2><p>{{ service.location }}</p><strong>{{ service.price }}</strong><span>{{ serviceAvailability(service) }}</span></div></aside>
+        <aside class="service-summary"><img :src="service.image" :alt="service.name" /><div><p class="eyebrow">{{ t('Your selection') }}</p><h2>{{ service.name }}</h2><p>{{ service.location }}</p><strong>{{ service.price }}</strong><span>{{ t(serviceAvailability(service)) }}</span></div></aside>
       </div>
-      <div v-else class="not-found"><h1>Service not found</h1><Button variant="outline" @click="goBack()">{{ backLabel }}</Button></div>
+      <div v-else class="not-found"><h1>{{ t('Service not found') }}</h1><Button variant="outline" @click="goBack()">{{ t(backLabel) }}</Button></div>
     </div>
   </div>
 </template>

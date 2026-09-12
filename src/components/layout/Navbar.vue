@@ -6,6 +6,7 @@ import Icon from '../common/Icon.vue'
 import { useAuth } from '../../composables/useAuth'
 import { useTheme } from '../../composables/useTheme'
 import { useNotifications } from '../../composables/useNotifications'
+import { useLanguage, t } from '../../composables/useLanguage'
 import { notificationKindMeta, relativeTime } from '../../utils/notifications'
 import { navLinks as links } from '../../data/navLinks'
 
@@ -16,6 +17,7 @@ const notificationsRef = ref<HTMLElement | null>(null)
 const { user, isLoggedIn } = useAuth()
 const { theme, toggleTheme } = useTheme()
 const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
+const { languageLabel, toggleLanguage } = useLanguage()
 
 const emit = defineEmits<{
   toggleSidebar: []
@@ -53,9 +55,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   <nav class="navbar">
     <div class="container navbar-inner">
       <router-link to="/" class="brand">
-        <span class="brand-mark">
-          <Icon name="plane" :size="17" />
-        </span>
+        <img src="/travelgo-mark.svg" alt="TravelGo" class="brand-mark" />
         <span class="brand-word">Travel<span class="brand-word-accent">Go</span></span>
       </router-link>
 
@@ -79,18 +79,28 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
             class="nav-link"
             :class="{ active: isActive(link.to) }"
           >
-            {{ link.label }}
+            {{ t(link.label) }}
           </router-link>
         </div>
 
         <div class="nav-right">
           <div class="nav-actions">
+            <button
+              type="button"
+              class="lang-btn"
+              :aria-label="`Switch language to ${languageLabel === 'EN' ? 'Khmer' : 'English'}`"
+              @click="toggleLanguage"
+            >
+              <Icon name="globe" :size="14" />
+              {{ languageLabel }}
+            </button>
+
             <div ref="notificationsRef" class="notifications-wrap">
               <button
                 type="button"
                 class="icon-btn"
                 :aria-expanded="isNotificationsOpen"
-                aria-label="Notifications"
+                :aria-label="t('Notifications')"
                 @click="isNotificationsOpen = !isNotificationsOpen"
               >
                 <Icon name="bell" :size="17" />
@@ -99,14 +109,14 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 
               <div v-if="isNotificationsOpen" class="notifications-panel">
                 <div class="notifications-head">
-                  <p class="notifications-title">Notifications</p>
+                  <p class="notifications-title">{{ t('Notifications') }}</p>
                   <button
                     v-if="unreadCount"
                     type="button"
                     class="mark-read-btn"
                     @click="markAllAsRead()"
                   >
-                    Mark all as read
+                    {{ t('Mark all as read') }}
                   </button>
                 </div>
                 <ul v-if="notifications.length" class="notifications-list">
@@ -124,13 +134,13 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
                         <span class="notification-title">{{ notification.title }}</span>
                         <span class="notification-time">{{ relativeTime(notification.createdAt) }}</span>
                       </span>
-                      <span v-if="!notification.read" class="unread-dot" aria-label="Unread" />
+                      <span v-if="!notification.read" class="unread-dot" :aria-label="t('Unread')" />
                     </router-link>
                   </li>
                 </ul>
-                <p v-else class="notifications-empty">You're all caught up — no new notifications.</p>
+                <p v-else class="notifications-empty">{{ t("You're all caught up — no new notifications.") }}</p>
                 <router-link to="/notifications" class="notifications-footer" @click="isNotificationsOpen = false">
-                  View all notifications
+                  {{ t('View all notifications') }}
                 </router-link>
               </div>
             </div>
@@ -139,7 +149,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
               type="button"
               class="icon-btn"
               :aria-pressed="theme === 'dark'"
-              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+              :aria-label="theme === 'dark' ? t('Switch to light mode') : t('Switch to dark mode')"
               @click="toggleTheme"
             >
               <Icon :name="theme === 'dark' ? 'sun' : 'moon'" :size="18" />
@@ -159,7 +169,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
           <button
             class="sidebar-toggle"
             type="button"
-            aria-label="Toggle application sidebar"
+            :aria-label="t('Toggle application sidebar')"
             @click="emit('toggleSidebar')"
           >
             <Icon name="map" :size="17" />
@@ -169,7 +179,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
             class="menu-toggle"
             type="button"
             :aria-expanded="isMenuOpen"
-            aria-label="Toggle menu"
+            :aria-label="t('Toggle menu')"
             @click="isMenuOpen = !isMenuOpen"
           >
             <span></span>
@@ -183,10 +193,13 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
     <MobileMenu v-if="!isAuthPage" :links="links" :open="isMenuOpen" @close="isMenuOpen = false">
       <template #extra>
         <router-link to="/profile" class="mobile-link" @click="isMenuOpen = false">
-          Profile
+          {{ t('Profile') }}
         </router-link>
+        <button type="button" class="mobile-link" @click="toggleLanguage">
+          🌐 {{ languageLabel === 'EN' ? 'ភាសាខ្មែរ' : 'English' }}
+        </button>
         <button type="button" class="mobile-link" @click="toggleTheme">
-          {{ theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode' }}
+          {{ theme === 'dark' ? t('Switch to Light Mode') : t('Switch to Dark Mode') }}
         </button>
       </template>
     </MobileMenu>
@@ -231,20 +244,11 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 }
 
 .brand-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--color-primary);
-  color: var(--color-white);
-  box-shadow: 0 3px 8px rgba(var(--color-primary-rgb), 0.35);
+  height: 37px;
+  object-fit: contain;
   flex-shrink: 0;
-}
-
-.brand-mark :deep(svg) {
-  transform: rotate(45deg);
 }
 
 .brand-word-accent {
@@ -310,6 +314,29 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   color: var(--color-primary);
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 34px;
+  padding: 0 0.7rem;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.lang-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .icon-btn:hover {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { t } from '../../composables/useLanguage'
 import Footer from './Footer.vue'
 import Navbar from './Navbar.vue'
 import Sidebar from './Sidebar.vue'
@@ -17,7 +18,7 @@ const isSidebarOpen = ref(false)
         v-if="isSidebarOpen"
         type="button"
         class="sidebar-backdrop"
-        aria-label="Close navigation"
+        :aria-label="t('Close navigation')"
         @click="isSidebarOpen = false"
       ></button>
 

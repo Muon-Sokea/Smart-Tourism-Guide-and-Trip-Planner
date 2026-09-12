@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    variant?: 'primary' | 'accent' | 'outline'
+    variant?: 'primary' | 'accent' | 'outline' | 'danger'
     to?: string
   }>(),
   { variant: 'primary' }
@@ -64,5 +64,14 @@ withDefaults(
 .btn.outline:hover {
   background: var(--color-primary);
   color: var(--color-white);
+}
+
+.btn.danger {
+  background: #a33a2b;
+  color: var(--color-white);
+}
+
+.btn.danger:hover {
+  background: #8c2f22;
 }
 </style>

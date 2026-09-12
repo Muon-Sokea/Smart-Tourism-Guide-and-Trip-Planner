@@ -1,6 +1,5 @@
 import { ref, watch } from 'vue'
 
-export type Language = 'en' | 'km'
 export type Currency = 'USD' | 'KHR'
 export type DateFormat = 'dmy' | 'mdy' | 'iso'
 export type LocationPermission = 'always' | 'while-using' | 'never'
@@ -10,8 +9,7 @@ export interface AppSettings {
   notifyBookings: boolean
   notifyTripReminders: boolean
   notifyServices: boolean
-  // Language & region
-  language: Language
+  // Language & region (language itself lives in useLanguage — one global state)
   currency: Currency
   dateFormat: DateFormat
   // Travel preferences
@@ -31,7 +29,6 @@ const defaultSettings: AppSettings = {
   notifyBookings: true,
   notifyTripReminders: true,
   notifyServices: false,
-  language: 'en',
   currency: 'USD',
   dateFormat: 'dmy',
   travelStyle: 'Balanced',
@@ -69,10 +66,8 @@ export const travelStyleOptions = ['Relaxed', 'Balanced', 'Adventurous']
 export const activityOptions = ['Culture', 'Beach', 'Nature', 'Adventure', 'Food', 'City', 'Wellness', 'Wildlife']
 export const budgetOptions = ['Budget', 'Mid-range', 'Luxury']
 export const transportOptions = ['Flight', 'Bus', 'Car Rental', 'Boat', 'Train']
-export const languageOptions: { value: Language; label: string }[] = [
-  { value: 'en', label: 'English' },
-  { value: 'km', label: 'Khmer · ភាសាខ្មែរ' },
-]
+// languageOptions lives in useLanguage so the navbar button and this page
+// always share one global language state.
 export const currencyOptions: { value: Currency; label: string }[] = [
   { value: 'USD', label: 'USD · US Dollar ($)' },
   { value: 'KHR', label: 'KHR · Cambodian Riel (៛)' },

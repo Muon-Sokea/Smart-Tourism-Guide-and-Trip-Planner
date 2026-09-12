@@ -2,13 +2,14 @@
 import type { Destination } from '../../types/destination'
 import DestinationCard from './DestinationCard.vue'
 import EmptyState from '../common/EmptyState.vue'
+import { t } from '../../composables/useLanguage'
 
 withDefaults(
   defineProps<{
     destinations: Destination[]
     emptyMessage?: string
   }>(),
-  { emptyMessage: 'No destinations found.' }
+  { emptyMessage: t('No destinations found.') }
 )
 </script>
 

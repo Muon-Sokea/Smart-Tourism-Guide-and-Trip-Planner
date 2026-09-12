@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useFavorites } from '../../composables/useFavorites'
 import { useTripPlanner } from '../../composables/useTripPlanner'
 import { serviceCatalog, findService, serviceAvailability, serviceLabel } from '../../utils/serviceCatalog'
+import { t } from '../../composables/useLanguage'
 import RatingDisplay from '../../components/explore/RatingDisplay.vue'
 import ExploreContentCard from '../../components/explore/ExploreContentCard.vue'
 import Button from '../../components/common/Button.vue'
@@ -17,10 +18,10 @@ const type = computed<'hotel' | 'restaurant' | 'activity'>(() => {
   return routeType === 'hotel' || routeType === 'restaurant' || routeType === 'activity' ? routeType : 'activity'
 })
 const service = computed(() => findService(type.value, Number(route.params.id)))
-const availability = computed(() => service.value ? serviceAvailability(service.value) : 'Not Available')
+const availability = computed(() => service.value ? t(serviceAvailability(service.value)) : t('Not Available'))
 const reviewCount = computed(() => service.value ? 32 + (service.value.id % 93) : 0)
 const rating = computed(() => service.value?.rating || 0)
-const displayPrice = computed(() => service.value?.price || 'Price unavailable')
+const displayPrice = computed(() => service.value?.price || t('Price unavailable'))
 const isDescriptionExpanded = ref(false)
 const areReviewsExpanded = ref(false)
 const selectedImage = ref('')
@@ -40,23 +41,23 @@ const mainImage = computed(() => selectedImage.value || service.value?.image || 
 
 const typeConfig = computed(() => {
   if (type.value === 'hotel') return {
-    icon: 'building', heading: 'About This Place', bookingAction: 'Book Now', unit: '/ night',
-    features: ['Wi-Fi', 'Breakfast', 'Swimming Pool', 'Parking', 'Air Conditioning', 'Restaurant'],
-    info: [{ label: 'Check-in', value: '2:00 PM', icon: 'clock' }, { label: 'Check-out', value: '12:00 PM', icon: 'clock' }, { label: 'Rooms', value: '48 rooms', icon: 'building' }, { label: 'Location', value: service.value?.location || '', icon: 'map-pin' }],
-    roomTypes: [{ name: 'Standard Room', price: service.value?.price || '$85 / night' }, { name: 'Deluxe Room', price: '$120 / night' }, { name: 'Suite', price: '$180 / night' }],
-    availabilityTitle: 'Available Rooms', availabilityItems: ['Standard Room', 'Deluxe Room', 'Suite'],
+    icon: 'building', heading: t('About This Place'), bookingAction: t('Book Now'), unit: '/ night',
+    features: [t('Wi-Fi'), t('Breakfast'), t('Swimming Pool'), t('Parking'), t('Air Conditioning'), t('Restaurant')],
+    info: [{ label: t('Check-in'), value: t('2:00 PM'), icon: 'clock' }, { label: t('Check-out'), value: t('12:00 PM'), icon: 'clock' }, { label: t('Rooms'), value: t('48 rooms'), icon: 'building' }, { label: t('Location'), value: service.value?.location || '', icon: 'map-pin' }],
+    roomTypes: [{ name: t('Standard Room'), price: service.value?.price || '$85 / night' }, { name: t('Deluxe Room'), price: '$120 / night' }, { name: t('Suite'), price: '$180 / night' }],
+    availabilityTitle: t('Available Rooms'), availabilityItems: [t('Standard Room'), t('Deluxe Room'), t('Suite')],
   }
   if (type.value === 'restaurant') return {
-    icon: 'utensils', heading: 'About This Place', bookingAction: 'Reserve Table', unit: 'per guest',
-    features: ['Outdoor Seating', 'Wi-Fi', 'Parking', 'Takeaway', 'Reservation'],
-    info: [{ label: 'Cuisine', value: service.value?.category || 'Local cuisine', icon: 'utensils' }, { label: 'Price range', value: service.value?.price || '$$', icon: 'star' }, { label: 'Opening hours', value: '10:00 AM - 10:00 PM', icon: 'clock' }, { label: 'Location', value: service.value?.location || '', icon: 'map-pin' }],
-    roomTypes: [], availabilityTitle: 'Available Reservation Times', availabilityItems: ['12:00', '18:00', '19:00', '20:00'],
+    icon: 'utensils', heading: t('About This Place'), bookingAction: t('Reserve Table'), unit: 'per guest',
+    features: [t('Outdoor Seating'), t('Wi-Fi'), t('Parking'), t('Takeaway'), t('Reservation')],
+    info: [{ label: t('Cuisine'), value: service.value?.category || t('Local cuisine'), icon: 'utensils' }, { label: t('Average price'), value: service.value?.price || '—', icon: 'star' }, { label: t('Opening hours'), value: t('10:00 AM - 10:00 PM'), icon: 'clock' }, { label: t('Location'), value: service.value?.location || '', icon: 'map-pin' }],
+    roomTypes: [], availabilityTitle: t('Available Reservation Times'), availabilityItems: ['12:00', '18:00', '19:00', '20:00'],
   }
   return {
-    icon: 'flag', heading: 'About This Activity', bookingAction: 'Book Now', unit: '/ person',
-    features: ['Local Guide', 'Transportation', 'Equipment', 'Entrance Fee'],
-    info: [{ label: 'Duration', value: '2 hours', icon: 'clock' }, { label: 'Difficulty', value: 'Easy', icon: 'flag' }, { label: 'Available dates', value: 'Daily', icon: 'calendar' }, { label: 'Available times', value: '8:00 AM, 2:00 PM', icon: 'clock' }, { label: 'Participants', value: 'Up to 12 people', icon: 'user' }, { label: 'Location', value: service.value?.location || '', icon: 'map-pin' }],
-    roomTypes: [], availabilityTitle: 'Available Dates', availabilityItems: ['10 Oct', '11 Oct', '12 Oct'], availabilityTimes: ['09:00', '13:00', '15:00'],
+    icon: 'flag', heading: t('About This Activity'), bookingAction: t('Book Now'), unit: '/ person',
+    features: [t('Local Guide'), t('Transportation'), t('Equipment'), t('Entrance Fee')],
+    info: [{ label: t('Duration'), value: t('2 hours'), icon: 'clock' }, { label: t('Difficulty'), value: t('Easy'), icon: 'flag' }, { label: t('Available dates'), value: t('Daily'), icon: 'calendar' }, { label: t('Available times'), value: t('8:00 AM, 2:00 PM'), icon: 'clock' }, { label: t('Participants'), value: t('Up to 12 people'), icon: 'user' }, { label: t('Location'), value: service.value?.location || '', icon: 'map-pin' }],
+    roomTypes: [], availabilityTitle: t('Available Dates'), availabilityItems: ['10 Oct', '11 Oct', '12 Oct'], availabilityTimes: ['09:00', '13:00', '15:00'],
   }
 })
 
@@ -77,58 +78,58 @@ function handleAddToTrip() {
 <template>
   <div v-if="service" class="service-details">
     <div class="container">
-      <router-link :to="{ path: '/explore', query: { type } }" class="back-link"><Icon name="arrow-left" :size="16" /> Back to Explore</router-link>
+      <router-link :to="{ path: '/explore', query: { type } }" class="back-link"><Icon name="arrow-left" :size="16" /> {{ t('Back to Explore') }}</router-link>
       <header class="service-header">
         <div class="service-heading">
           <p class="eyebrow">{{ service.category }}</p>
           <h1>{{ service.name }}</h1>
-          <div class="service-meta"><span><Icon name="map-pin" :size="16" /> {{ service.location || 'Location unavailable' }}</span><span v-if="rating" class="rating"><RatingDisplay :rating="rating" /> ({{ reviewCount }} reviews)</span><span v-else>No ratings yet</span></div>
+          <div class="service-meta"><span><Icon name="map-pin" :size="16" /> {{ service.location || t('Location unavailable') }}</span><span v-if="rating" class="rating"><RatingDisplay :rating="rating" /> ({{ reviewCount }} {{ t('reviews') }})</span><span v-else>{{ t('No ratings yet') }}</span></div>
           <p class="lead">{{ service.description }}</p>
         </div>
       </header>
-      <section class="gallery" aria-label="Service image gallery">
+      <section class="gallery" :aria-label="t('Service image gallery')">
         <div class="gallery-main">
           <img v-if="mainImage" :src="mainImage" :alt="service.name" />
-          <div v-else class="image-placeholder"><Icon :name="typeConfig.icon" :size="36" /><span>Image unavailable</span></div>
-          <span class="gallery-label"><Icon :name="typeConfig.icon" :size="15" /> {{ serviceLabel(service.type) }}</span>
-          <button type="button" class="favorite-btn" :aria-pressed="isFavorite(service.id)" aria-label="Save service" @click="toggleFavorite(service.id)"><Icon :name="isFavorite(service.id) ? 'heart-filled' : 'heart'" :size="21" /></button>
+          <div v-else class="image-placeholder"><Icon :name="typeConfig.icon" :size="36" /><span>{{ t('Image unavailable') }}</span></div>
+          <span class="gallery-label"><Icon :name="typeConfig.icon" :size="15" /> {{ t(serviceLabel(service.type)) }}</span>
+          <button type="button" class="favorite-btn" :aria-pressed="isFavorite(service.id)" :aria-label="t('Save service')" @click="toggleFavorite(service.id)"><Icon :name="isFavorite(service.id) ? 'heart-filled' : 'heart'" :size="21" /></button>
         </div>
         <div class="gallery-thumbnails">
           <button v-for="image in galleryImages" :key="image.id" type="button" class="thumbnail" :class="{ active: mainImage === image.image }" :aria-label="`Show image of ${image.name}`" @click="selectedImage = image.image"><img :src="image.image" :alt="image.name" /></button>
         </div>
       </section>
-      <section class="booking-bar" aria-label="Booking actions">
+      <section class="booking-bar" :aria-label="t('Booking actions')">
         <div class="booking-summary">
           <span v-if="service.type === 'restaurant'" class="booking-category">{{ service.price || 'Price unavailable' }}</span>
           <strong>{{ displayPrice }}</strong>
           <span v-if="service.price && service.type === 'activity'">{{ typeConfig.unit }}</span>
           <span v-if="service.type === 'activity'" class="booking-detail"><Icon name="clock" :size="15" /> 2 hours</span>
-          <span class="availability" :class="{ limited: availability === 'Limited Availability' }"><Icon name="check" :size="15" /> {{ availability === 'Not Available' ? 'Not Available' : availability }}</span>
+          <span class="availability" :class="{ limited: availability === t('Limited Availability') }"><Icon name="check" :size="15" /> {{ availability }}</span>
         </div>
         <div class="booking-actions">
-          <Button v-if="canAddToTrip" variant="outline" :disabled="isInTrip" @click="handleAddToTrip"><Icon :name="isInTrip ? 'check' : 'plus'" :size="16" /> {{ isInTrip ? 'Added to Trip' : 'Add to Trip' }}</Button>
-          <Button v-if="availability !== 'Not Available'" :to="`/book/${service.type}/${service.id}`" variant="accent"><Icon name="calendar" :size="16" /> {{ typeConfig.bookingAction }}</Button>
-          <span v-else class="unavailable">Booking unavailable for this service.</span>
+          <Button v-if="canAddToTrip" variant="outline" :disabled="isInTrip" @click="handleAddToTrip"><Icon :name="isInTrip ? 'check' : 'plus'" :size="16" /> {{ isInTrip ? t('Added to Trip') : t('Add to Trip') }}</Button>
+          <Button v-if="availability !== t('Not Available')" :to="`/book/${service.type}/${service.id}`" variant="accent"><Icon name="calendar" :size="16" /> {{ typeConfig.bookingAction }}</Button>
+          <span v-else class="unavailable">{{ t('Booking unavailable for this service.') }}</span>
         </div>
         <p v-if="lastAddedMessage" class="trip-added-note" role="status">{{ lastAddedMessage }}</p>
       </section>
       <div class="details-layout">
         <main class="details-content">
-          <section class="detail-section"><div class="section-heading"><p class="eyebrow">Service information</p><h2>{{ typeConfig.heading }}</h2></div><p :class="{ truncated: !isDescriptionExpanded }">{{ service.description }} This experience is designed for travelers who want a comfortable, well-organized way to enjoy the destination, with helpful local details available before they arrive.</p><button type="button" class="text-button" @click="isDescriptionExpanded = !isDescriptionExpanded">{{ isDescriptionExpanded ? 'Show Less' : 'Read More' }}</button></section>
-          <section class="detail-section"><div class="section-heading"><p class="eyebrow">What you can expect</p><h2>{{ service.type === 'hotel' ? 'Facilities' : service.type === 'restaurant' ? 'Available services' : "What's included" }}</h2></div><div class="feature-grid"><div v-for="feature in typeConfig.features" :key="feature" class="feature-item"><span class="feature-icon"><Icon name="check" :size="16" /></span>{{ feature }}</div></div></section>
-          <section v-if="typeConfig.roomTypes.length" class="detail-section"><div class="section-heading"><p class="eyebrow">Stay options</p><h2>Room types</h2></div><div class="room-list"><div v-for="room in typeConfig.roomTypes" :key="room.name" class="room-row"><span>{{ room.name }}</span><strong>{{ room.price }}</strong></div></div></section>
+          <section class="detail-section"><div class="section-heading"><p class="eyebrow">{{ t('Service information') }}</p><h2>{{ typeConfig.heading }}</h2></div><p :class="{ truncated: !isDescriptionExpanded }">{{ service.description }} {{ t('This experience is designed for travelers who want a comfortable, well-organized way to enjoy the destination, with helpful local details available before they arrive.') }}</p><button type="button" class="text-button" @click="isDescriptionExpanded = !isDescriptionExpanded">{{ isDescriptionExpanded ? t('Show Less') : t('Read More') }}</button></section>
+          <section class="detail-section"><div class="section-heading"><p class="eyebrow">{{ t('What you can expect') }}</p><h2>{{ service.type === 'hotel' ? t('Facilities') : service.type === 'restaurant' ? t('Available services') : t("What's included") }}</h2></div><div class="feature-grid"><div v-for="feature in typeConfig.features" :key="feature" class="feature-item"><span class="feature-icon"><Icon name="check" :size="16" /></span>{{ feature }}</div></div></section>
+          <section v-if="typeConfig.roomTypes.length" class="detail-section"><div class="section-heading"><p class="eyebrow">{{ t('Stay options') }}</p><h2>{{ t('Room types') }}</h2></div><div class="room-list"><div v-for="room in typeConfig.roomTypes" :key="room.name" class="room-row"><span>{{ room.name }}</span><strong>{{ room.price }}</strong></div></div></section>
           <div class="info-availability-row">
-            <section class="detail-section"><div class="section-heading"><p class="eyebrow">At a glance</p><h2>{{ serviceLabel(service.type) }} information</h2></div><div class="info-grid"><div v-for="item in typeConfig.info" :key="item.label" class="info-item"><Icon :name="item.icon" :size="18" /><span><small>{{ item.label }}</small><strong>{{ item.value }}</strong></span></div></div></section>
-            <section class="detail-section availability-section"><div class="section-heading"><p class="eyebrow">Plan ahead</p><h2>{{ typeConfig.availabilityTitle }}</h2></div><div class="availability-list"><span v-for="item in typeConfig.availabilityItems" :key="item"><Icon name="check" :size="14" /> {{ item }}</span></div><template v-if="typeConfig.availabilityTimes"><h3>Available Times</h3><div class="availability-list"><span v-for="time in typeConfig.availabilityTimes" :key="time"><Icon name="clock" :size="14" /> {{ time }}</span></div></template></section>
+            <section class="detail-section"><div class="section-heading"><p class="eyebrow">{{ t('At a glance') }}</p><h2>{{ t(serviceLabel(service.type)) }} {{ t('information') }}</h2></div><div class="info-grid"><div v-for="item in typeConfig.info" :key="item.label" class="info-item"><Icon :name="item.icon" :size="18" /><span><small>{{ item.label }}</small><strong>{{ item.value }}</strong></span></div></div></section>
+            <section class="detail-section availability-section"><div class="section-heading"><p class="eyebrow">{{ t('Plan ahead') }}</p><h2>{{ typeConfig.availabilityTitle }}</h2></div><div class="availability-list"><span v-for="item in typeConfig.availabilityItems" :key="item"><Icon name="check" :size="14" /> {{ item }}</span></div><template v-if="typeConfig.availabilityTimes"><h3>{{ t('Available Times') }}</h3><div class="availability-list"><span v-for="time in typeConfig.availabilityTimes" :key="time"><Icon name="clock" :size="14" /> {{ time }}</span></div></template></section>
           </div>
-          <section class="detail-section location-section"><div class="section-heading"><p class="eyebrow">Find your way</p><h2>Location</h2></div><div class="location-panel"><Icon name="map-pin" :size="24" /><div><strong>{{ service.location || 'Location unavailable' }}</strong><p>Open the full map page to see the exact position.</p></div><Button :to="`/map?service=${service.type}/${service.id}`" variant="outline">View on Map</Button></div></section>
-          <section class="detail-section reviews-section"><div class="section-heading"><p class="eyebrow">Traveler feedback</p><h2>Reviews</h2></div><div v-if="rating" class="review-summary"><RatingDisplay :rating="rating" /><span>Based on {{ reviewCount }} reviews</span></div><p v-else class="review-quote">No ratings yet.</p><div v-if="rating" class="review-list"><article v-for="review in (areReviewsExpanded ? sampleReviews : sampleReviews.slice(0, 2))" :key="review.name"><div class="review-author"><span class="review-avatar">{{ review.initials }}</span><span class="review-author-details"><strong>{{ review.name }}</strong><small>Verified traveler</small></span><RatingDisplay :rating="rating" /></div><p class="review-title">{{ review.title }}</p><p>{{ review.text }}</p></article></div><button v-if="rating" type="button" class="text-button reviews-toggle" @click="areReviewsExpanded = !areReviewsExpanded">{{ areReviewsExpanded ? 'Show Fewer Reviews' : 'Read More Reviews' }}</button></section>
+          <section class="detail-section location-section"><div class="section-heading"><p class="eyebrow">{{ t('Find your way') }}</p><h2>{{ t('Location') }}</h2></div><div class="location-panel"><Icon name="map-pin" :size="24" /><div><strong>{{ service.location || t('Location unavailable') }}</strong><p>{{ t('Open the full map page to see the exact position.') }}</p></div><Button :to="`/map?service=${service.type}/${service.id}`" variant="outline">{{ t('View on Map') }}</Button></div></section>
+          <section class="detail-section reviews-section"><div class="section-heading"><p class="eyebrow">{{ t('Traveler feedback') }}</p><h2>{{ t('Reviews') }}</h2></div><div v-if="rating" class="review-summary"><RatingDisplay :rating="rating" /><span>{{ t('Based on {count} reviews', { count: reviewCount }) }}</span></div><p v-else class="review-quote">{{ t('No ratings yet.') }}</p><div v-if="rating" class="review-list"><article v-for="review in (areReviewsExpanded ? sampleReviews : sampleReviews.slice(0, 2))" :key="review.name"><div class="review-author"><span class="review-avatar">{{ review.initials }}</span><span class="review-author-details"><strong>{{ review.name }}</strong><small>{{ t('Verified traveler') }}</small></span><RatingDisplay :rating="rating" /></div><p class="review-title">{{ review.title }}</p><p>{{ review.text }}</p></article></div><button v-if="rating" type="button" class="text-button reviews-toggle" @click="areReviewsExpanded = !areReviewsExpanded">{{ areReviewsExpanded ? t('Show Fewer Reviews') : t('Read More Reviews') }}</button></section>
         </main>
       </div>
-      <section v-if="relatedServices.length" class="related-section"><div class="section-heading"><p class="eyebrow">Keep exploring</p><h2>Related {{ serviceLabel(service.type).toLowerCase() }}s</h2></div><div class="related-grid"><ExploreContentCard v-for="related in relatedServices" :key="related.id" :item="related" /></div></section>
+      <section v-if="relatedServices.length" class="related-section"><div class="section-heading"><p class="eyebrow">{{ t('Keep exploring') }}</p><h2>{{ t('Related') }} {{ t(serviceLabel(service.type)) }}</h2></div><div class="related-grid"><ExploreContentCard v-for="related in relatedServices" :key="related.id" :item="related" /></div></section>
     </div>
   </div>
-  <div v-else class="not-found"><div class="container"><h1>Service Not Found</h1><p>The service you are looking for could not be found.</p><router-link to="/explore" class="back-link"><Icon name="arrow-left" :size="16" /> Back to Explore</router-link></div></div>
+  <div v-else class="not-found"><div class="container"><h1>{{ t('Service Not Found') }}</h1><p>{{ t('The service you are looking for could not be found.') }}</p><router-link to="/explore" class="back-link"><Icon name="arrow-left" :size="16" /> {{ t('Back to Explore') }}</router-link></div></div>
 </template>
 
 <style scoped>
