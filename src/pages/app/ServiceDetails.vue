@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useFavorites } from '../../composables/useFavorites'
 import { useTripPlanner } from '../../composables/useTripPlanner'
 import { serviceCatalog, findService, serviceAvailability, serviceLabel } from '../../utils/serviceCatalog'
-import { useGeocodedPoint } from '../../utils/geocode'
 import RatingDisplay from '../../components/explore/RatingDisplay.vue'
 import ExploreContentCard from '../../components/explore/ExploreContentCard.vue'
-import PlaceMap from '../../components/explore/PlaceMap.vue'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 
@@ -39,16 +37,6 @@ const canAddToTrip = computed(() => Boolean(service.value))
 const isInTrip = computed(() => (service.value ? isPlaceInTrip(type.value, service.value.id) : false))
 const galleryImages = computed(() => service.value ? [service.value, ...relatedServices.value] : [])
 const mainImage = computed(() => selectedImage.value || service.value?.image || '')
-
-/* Real per-service map: geocode the service's own location string so every
-   hotel/restaurant/activity shows its actual place, not one fixed position. */
-const { point: servicePoint, isLoading: isLocating, resolve: resolveServicePoint } = useGeocodedPoint(() => service.value?.location || '')
-onMounted(() => {
-  void resolveServicePoint()
-})
-watch(() => service.value?.location, () => {
-  void resolveServicePoint()
-})
 
 const typeConfig = computed(() => {
   if (type.value === 'hotel') return {
@@ -133,8 +121,7 @@ function handleAddToTrip() {
             <section class="detail-section"><div class="section-heading"><p class="eyebrow">At a glance</p><h2>{{ serviceLabel(service.type) }} information</h2></div><div class="info-grid"><div v-for="item in typeConfig.info" :key="item.label" class="info-item"><Icon :name="item.icon" :size="18" /><span><small>{{ item.label }}</small><strong>{{ item.value }}</strong></span></div></div></section>
             <section class="detail-section availability-section"><div class="section-heading"><p class="eyebrow">Plan ahead</p><h2>{{ typeConfig.availabilityTitle }}</h2></div><div class="availability-list"><span v-for="item in typeConfig.availabilityItems" :key="item"><Icon name="check" :size="14" /> {{ item }}</span></div><template v-if="typeConfig.availabilityTimes"><h3>Available Times</h3><div class="availability-list"><span v-for="time in typeConfig.availabilityTimes" :key="time"><Icon name="clock" :size="14" /> {{ time }}</span></div></template></section>
           </div>
-          <section class="detail-section location-section"><div class="section-heading"><p class="eyebrow">Find your way</p><h2>Location</h2></div><div class="location-panel"><Icon name="map-pin" :size="24" /><div><strong>{{ service.location || 'Location unavailable' }}</strong><p>{{ isLocating ? 'Finding exact position on the map…' : 'Real position shown below, or open the full map page.' }}</p></div><Button :to="`/map?service=${service.type}/${service.id}`" variant="outline">View on Map</Button></div></section>
-          <section v-if="servicePoint" class="detail-section map-section"><PlaceMap :point="servicePoint" :title="service.name" :subtitle="service.location" /></section>
+          <section class="detail-section location-section"><div class="section-heading"><p class="eyebrow">Find your way</p><h2>Location</h2></div><div class="location-panel"><Icon name="map-pin" :size="24" /><div><strong>{{ service.location || 'Location unavailable' }}</strong><p>Open the full map page to see the exact position.</p></div><Button :to="`/map?service=${service.type}/${service.id}`" variant="outline">View on Map</Button></div></section>
           <section class="detail-section reviews-section"><div class="section-heading"><p class="eyebrow">Traveler feedback</p><h2>Reviews</h2></div><div v-if="rating" class="review-summary"><RatingDisplay :rating="rating" /><span>Based on {{ reviewCount }} reviews</span></div><p v-else class="review-quote">No ratings yet.</p><div v-if="rating" class="review-list"><article v-for="review in (areReviewsExpanded ? sampleReviews : sampleReviews.slice(0, 2))" :key="review.name"><div class="review-author"><span class="review-avatar">{{ review.initials }}</span><span class="review-author-details"><strong>{{ review.name }}</strong><small>Verified traveler</small></span><RatingDisplay :rating="rating" /></div><p class="review-title">{{ review.title }}</p><p>{{ review.text }}</p></article></div><button v-if="rating" type="button" class="text-button reviews-toggle" @click="areReviewsExpanded = !areReviewsExpanded">{{ areReviewsExpanded ? 'Show Fewer Reviews' : 'Read More Reviews' }}</button></section>
         </main>
       </div>
