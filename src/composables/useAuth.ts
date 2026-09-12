@@ -36,9 +36,15 @@ export function useAuth() {
     user.value = { name: user.value?.name ?? email.split('@')[0], email }
   }
 
+  function updateProfile(profile: Partial<User>) {
+    if (user.value) {
+      user.value = { ...user.value, ...profile }
+    }
+  }
+
   function logout() {
     user.value = null
   }
 
-  return { user, isLoggedIn, signup, login, logout }
+  return { user, isLoggedIn, signup, login, updateProfile, logout }
 }

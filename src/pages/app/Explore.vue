@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import SearchBar from '../../components/common/SearchBar.vue'
 import DestinationGrid from '../../components/explore/DestinationGrid.vue'
@@ -46,7 +46,11 @@ const sortOptions = [
 ] as const
 
 const searchQuery = ref(typeof route.query.search === 'string' ? route.query.search : '')
-const selectedCategory = ref<(typeof categories)[number]['value']>('all')
+const selectedCategory = ref<(typeof categories)[number]['value']>(
+  typeof route.query.type === 'string' && categories.some((category) => category.value === route.query.type)
+    ? (route.query.type as (typeof categories)[number]['value'])
+    : 'all'
+)
 const destinationCategory = ref(
   typeof route.query.category === 'string' && destinationCategories.includes(route.query.category)
     ? route.query.category
@@ -169,6 +173,27 @@ const exploreMoreContent = computed(() =>
 
 const hasResults = computed(
   () => exploreMoreDestinations.value.length > 0 || exploreMoreContent.value.length > 0
+)
+
+/* Vue Router reuses this component when only the query changes (e.g. the Home
+   hero search or a category tile navigating to /explore?... while Explore is
+   already open), so re-read the query on every navigation instead of only at
+   setup. A missing param resets its filter back to the default. */
+watch(
+  () => route.query,
+  (query) => {
+    searchQuery.value = typeof query.search === 'string' ? query.search : ''
+    if (typeof query.type === 'string' && categories.some((category) => category.value === query.type)) {
+      selectedCategory.value = query.type as (typeof categories)[number]['value']
+    } else if (!('type' in query)) {
+      selectedCategory.value = 'all'
+    }
+    if (typeof query.category === 'string' && destinationCategories.includes(query.category)) {
+      destinationCategory.value = query.category
+    } else if (!('category' in query)) {
+      destinationCategory.value = 'All'
+    }
+  }
 )
 
 function clearFilters() {
@@ -469,6 +494,10 @@ function clearFilters() {
   gap: 1.1rem;
 }
 
+.results-section .content-grid {
+  margin-top: 1.35rem;
+}
+
 .content-featured {
   padding-top: 0.5rem;
 }
@@ -499,6 +528,16 @@ function clearFilters() {
 
   .content-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content-card {
+    transition: none;
+  }
+
+  .content-card:hover {
+    transform: none;
   }
 }
 </style>

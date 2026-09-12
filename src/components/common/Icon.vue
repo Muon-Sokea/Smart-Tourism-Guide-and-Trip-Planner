@@ -121,6 +121,21 @@ withDefaults(
       <polyline points="12 5 19 12 12 19" />
     </template>
 
+    <template v-else-if="name === 'arrow-left'">
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 5 5 12 12 19" />
+    </template>
+
+    <template v-else-if="name === 'arrow-up'">
+      <line x1="12" y1="19" x2="12" y2="5" />
+      <polyline points="5 12 12 5 19 12" />
+    </template>
+
+    <template v-else-if="name === 'arrow-down'">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <polyline points="19 12 12 19 5 12" />
+    </template>
+
     <template v-else-if="name === 'map-pin'">
       <path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11Z" />
       <circle cx="12" cy="10" r="2.5" />
@@ -214,9 +229,59 @@ withDefaults(
       <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" fill="currentColor" />
     </template>
 
+    <template v-else-if="name === 'navigation'">
+      <polygon points="12 3 19 21 12 17 5 21 12 3" />
+    </template>
+
+    <template v-else-if="name === 'share'">
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <line x1="8.6" y1="10.5" x2="15.4" y2="6.5" />
+      <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
+    </template>
+
+    <template v-else-if="name === 'more-horizontal'">
+      <circle cx="5" cy="12" r="1" fill="currentColor" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" />
+      <circle cx="19" cy="12" r="1" fill="currentColor" />
+    </template>
+
+    <template v-else-if="name === 'fullscreen'">
+      <polyline points="8 3 3 3 3 8" />
+      <polyline points="16 3 21 3 21 8" />
+      <polyline points="21 16 21 21 16 21" />
+      <polyline points="3 16 3 21 8 21" />
+    </template>
+
+    <template v-else-if="name === 'settings'">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 1.7-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.4v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L8 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6v-2.4h.9a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L8 8.6l1.7-1.7.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2h2.4v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.7 1.7-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2V14h-.2a1.7 1.7 0 0 0-1.5 1Z" />
+    </template>
+
     <template v-else-if="name === 'bell'">
       <path d="M18 16v-5a6 6 0 1 0-12 0v5l-2 3h16l-2-3Z" />
       <path d="M10 21a2 2 0 0 0 4 0" />
+    </template>
+
+    <template v-else-if="name === 'phone'">
+      <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 2Z" />
+    </template>
+
+    <template v-else-if="name === 'globe'">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z" />
+    </template>
+
+    <template v-else-if="name === 'shield'">
+      <path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10Z" />
+    </template>
+
+    <template v-else-if="name === 'alert'">
+      <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+      <line x1="12" y1="9" x2="12" y2="13" />
+      <circle cx="12" cy="17" r="1" fill="currentColor" />
     </template>
   </svg>
 </template>

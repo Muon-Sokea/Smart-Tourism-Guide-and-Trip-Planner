@@ -32,5 +32,10 @@ export function useTheme() {
     theme.value = theme.value === 'dark' ? 'light' : 'dark'
   }
 
-  return { theme, toggleTheme }
+  // Explicit setter — used by the Settings page's Light/Dark mode cards.
+  function setTheme(value: Theme) {
+    theme.value = value
+  }
+
+  return { theme, setTheme, toggleTheme }
 }

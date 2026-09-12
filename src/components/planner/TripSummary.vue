@@ -6,9 +6,16 @@ defineProps<{
     places: number
     days: number
     distanceKm: number
-    travelHours: number
+    travelMinutes: number
   }
 }>()
+
+function formatTravelTime(minutes: number) {
+  if (minutes < 60) return `${minutes} min`
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours}h`
+}
 </script>
 
 <template>
@@ -36,7 +43,7 @@ defineProps<{
 
       <div class="summary-item">
         <Icon name="clock" :size="20" />
-        <span class="summary-value">{{ summary.travelHours.toFixed(1) }}h</span>
+        <span class="summary-value">{{ formatTravelTime(summary.travelMinutes) }}</span>
         <span class="summary-label">Est. Travel Time</span>
       </div>
     </div>
@@ -48,31 +55,33 @@ defineProps<{
   background: var(--color-white);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
 .trip-summary h2 {
   color: var(--color-primary);
-  margin: 0 0 1.25rem;
+  margin: 0 0 1rem;
+  font-size: var(--fs-section-title);
+  font-weight: 700;
 }
 
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .summary-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
   text-align: center;
   color: var(--color-primary);
 }
 
 .summary-value {
-  font-size: var(--fs-stat);
+  font-size: var(--fs-card-title);
   font-weight: 700;
 }
 

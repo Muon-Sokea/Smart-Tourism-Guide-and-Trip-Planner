@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useTripPlanner } from '../../composables/useTripPlanner'
 import { destinations } from '../../data/destinations'
+import type { Destination } from '../../types/destination'
 import DaySelector from '../../components/planner/DaySelector.vue'
 import ItineraryItemRow from '../../components/planner/ItineraryItem.vue'
 import TripSummary from '../../components/planner/TripSummary.vue'
@@ -11,11 +12,15 @@ import type { BudgetCategory } from '../../types/trip'
 
 const {
   trip,
-  destinationById,
   itemsForDay,
-  addDestination,
+  addPlace,
+  isPlaceInTrip,
+  placeForItem,
+  moveItem,
   removeItem,
   updateItem,
+  lastAddedMessage,
+  showPlaceAdded,
   setTripInfo,
   addExpense,
   updateExpense,
@@ -26,6 +31,7 @@ const {
   budgetTotal,
   completedChecklist,
   summary,
+  saveToMyTrips,
 } = useTripPlanner()
 
 const activeDay = ref(1)
@@ -71,7 +77,8 @@ function saveTrip() {
   }
   formError.value = ''
   setTripInfo({ ...tripForm.value, name: tripForm.value.name.trim() })
-  saveMessage.value = 'Trip saved locally.'
+  saveToMyTrips()
+  saveMessage.value = 'Trip saved to My Trips.'
   window.setTimeout(() => (saveMessage.value = ''), 2500)
 }
 
@@ -86,6 +93,12 @@ function addChecklist() {
   addChecklistItem(checklistDraft.value.trim())
   checklistDraft.value = ''
 }
+
+function addFromPanel(destination: Destination) {
+  const result = addPlace('destination', destination.id, activeDay.value)
+  if (result === 'added') showPlaceAdded(destination.name)
+  isAdding.value = false
+}
 </script>
 
 <template>
@@ -98,7 +111,8 @@ function addChecklist() {
           <p class="planner-intro">Shape an idea into an itinerary, budget, and checklist you can take with you.</p>
         </div>
         <div class="save-area">
-          <span v-if="saveMessage" class="save-message">{{ saveMessage }}</span>
+          <span v-if="lastAddedMessage" class="save-message added-message" role="status">{{ lastAddedMessage }}</span>
+          <span v-else-if="saveMessage" class="save-message">{{ saveMessage }}</span>
           <Button variant="accent" @click="saveTrip"><Icon name="check" :size="16" /> Save Trip</Button>
         </div>
       </header>
@@ -112,41 +126,41 @@ function addChecklist() {
           <label><span>Destination</span><select v-model="tripForm.destination"><option value="" disabled>Select a destination</option><option v-for="destination in destinations" :key="destination.id" :value="`${destination.name}, ${destination.country}`">{{ destination.name }}, {{ destination.country }}</option></select></label>
           <label><span>Start date</span><input v-model="tripForm.startDate" type="date" /></label>
           <label><span>End date</span><input v-model="tripForm.endDate" type="date" :min="tripForm.startDate" /></label>
-          <Button variant="primary" type="submit">Create / Update Trip</Button>
+          <Button variant="primary" type="submit">Create Trip</Button>
         </form>
       </section>
 
       <div class="planner-layout">
         <main class="planner-main">
-          <section class="planner-section">
+          <section class="planner-section itinerary-section">
             <div class="section-heading section-heading-row"><div><p class="eyebrow">Step 2</p><h2>Itinerary</h2></div><span class="section-count">{{ trip.items.length }} activities</span></div>
             <DaySelector v-model="activeDay" :total-days="trip.days" />
             <div class="itinerary">
-              <ItineraryItemRow v-for="(item, index) in activeDayItems" :key="item.id" :item="item" :destination="destinationById.get(item.destinationId)" :is-last="index === activeDayItems.length - 1" @remove="removeItem" @update="(changes) => updateItem(item.id, changes)" />
+              <ItineraryItemRow v-for="(item, index) in activeDayItems" :key="item.id" :item="item" :place="placeForItem(item)" :total-days="trip.days" :is-last="index === activeDayItems.length - 1" @remove="removeItem" @move="({ id, direction }) => moveItem(id, direction)" @update="(changes) => updateItem(item.id, changes)" />
               <p v-if="!activeDayItems.length" class="empty-day">No plans on Day {{ activeDay }} yet. Add a place below.</p>
             </div>
             <Button variant="accent" @click="isAdding = !isAdding"><Icon name="plus" :size="16" /> Add Place or Activity</Button>
             <div v-if="isAdding" class="add-panel">
               <input v-model="addSearch" class="add-search" type="search" placeholder="Search destinations..." />
-              <ul class="add-list"><li v-for="destination in addableDestinations" :key="destination.id"><span><strong>{{ destination.name }}</strong><em>{{ destination.country }} · {{ destination.category }}</em></span><button type="button" @click="addDestination(destination.id, activeDay); isAdding = false"><Icon name="plus" :size="14" /> Add</button></li></ul>
+              <ul class="add-list"><li v-for="destination in addableDestinations" :key="destination.id" :class="{ added: isPlaceInTrip('destination', destination.id) }"><span><strong>{{ destination.name }}</strong><em>{{ destination.country }} · {{ destination.category }}</em></span><button type="button" :disabled="isPlaceInTrip('destination', destination.id)" @click="addFromPanel(destination)"><Icon :name="isPlaceInTrip('destination', destination.id) ? 'check' : 'plus'" :size="14" /> {{ isPlaceInTrip('destination', destination.id) ? 'In Trip' : 'Add' }}</button></li></ul>
             </div>
           </section>
 
-          <section class="planner-section">
+          <section class="planner-section budget-section">
             <div class="section-heading section-heading-row"><div><p class="eyebrow">Step 3</p><h2>Budget</h2></div><strong class="total-amount">${{ budgetTotal.toFixed(0) }}</strong></div>
             <form class="expense-form" @submit.prevent="addBudgetExpense"><select v-model="expenseForm.category" aria-label="Expense category"><option>Transportation</option><option>Accommodation</option><option>Food</option><option>Activities</option><option>Other</option></select><input v-model="expenseForm.description" type="text" placeholder="Expense description" aria-label="Expense description" /><input v-model.number="expenseForm.amount" type="number" min="0.01" step="0.01" placeholder="Amount" aria-label="Expense amount" /><button type="submit" class="icon-action" aria-label="Add expense"><Icon name="plus" :size="17" /></button></form>
             <div v-if="trip.budget.length" class="expense-list"><div v-for="expense in trip.budget" :key="expense.id" class="expense-row"><select :value="expense.category" @change="updateExpense(expense.id, { category: ($event.target as HTMLSelectElement).value as BudgetCategory })"><option>Transportation</option><option>Accommodation</option><option>Food</option><option>Activities</option><option>Other</option></select><input :value="expense.description" aria-label="Edit expense description" @change="updateExpense(expense.id, { description: ($event.target as HTMLInputElement).value })" /><input :value="expense.amount" type="number" min="0" step="0.01" aria-label="Edit expense amount" @change="updateExpense(expense.id, { amount: Number(($event.target as HTMLInputElement).value) || 0 })" /><button type="button" class="icon-action muted" aria-label="Delete expense" @click="removeExpense(expense.id)"><Icon name="trash" :size="16" /></button></div></div>
             <p v-else class="empty-inline">Add estimated expenses to track your trip total.</p>
           </section>
 
-          <section class="planner-section">
+          <section class="planner-section checklist-section">
             <div class="section-heading section-heading-row"><div><p class="eyebrow">Step 4</p><h2>Checklist</h2></div><span class="section-count">{{ checklistProgress }} complete</span></div>
             <form class="checklist-form" @submit.prevent="addChecklist"><input v-model="checklistDraft" type="text" placeholder="Add a checklist item" /><button type="submit" class="icon-action" aria-label="Add checklist item"><Icon name="plus" :size="17" /></button></form>
             <ul class="checklist"><li v-for="item in trip.checklist" :key="item.id" :class="{ completed: item.completed }"><button type="button" class="check-toggle" :aria-label="item.completed ? 'Mark incomplete' : 'Mark complete'" @click="toggleChecklistItem(item.id)"><Icon :name="item.completed ? 'check' : 'plus'" :size="14" /></button><span>{{ item.label }}</span><button type="button" class="icon-action muted" aria-label="Remove checklist item" @click="removeChecklistItem(item.id)"><Icon name="trash" :size="15" /></button></li></ul>
           </section>
         </main>
 
-        <aside class="planner-sidebar"><TripSummary :summary="summary" /><section class="summary-card"><p class="eyebrow">Your trip</p><h2>{{ trip.name }}</h2><p>{{ trip.destination || 'Choose a destination above' }}</p><div class="summary-stats"><span><strong>{{ trip.days }}</strong> days</span><span><strong>{{ trip.items.length }}</strong> activities</span><span><strong>${{ budgetTotal.toFixed(0) }}</strong> budget</span><span><strong>{{ checklistProgress }}</strong> checklist</span></div></section><Button to="/map" variant="outline"><Icon name="route" :size="16" /> View Route</Button></aside>
+        <aside class="planner-sidebar"><TripSummary class="planner-summary" :summary="summary" /><section class="summary-card"><p class="eyebrow">Your trip</p><h2>{{ trip.name }}</h2><p>{{ trip.destination || 'Choose a destination above' }}</p><div class="summary-stats"><span><strong>{{ trip.days }}</strong> days</span><span><strong>{{ trip.items.length }}</strong> activities</span><span><strong>${{ budgetTotal.toFixed(0) }}</strong> budget</span><span><strong>{{ checklistProgress }}</strong> checklist</span></div></section><div class="sidebar-actions"><Button class="route-button" to="/map" variant="outline"><Icon name="route" :size="16" /> View Route</Button><Button class="trips-button" to="/trips" variant="outline"><Icon name="calendar" :size="16" /> My Trips</Button></div></aside>
       </div>
     </div>
   </div>
@@ -168,13 +182,15 @@ function addChecklist() {
 .trip-form label, .checklist-form { display: flex; flex-direction: column; gap: 0.35rem; }
 .trip-form label span { color: var(--color-primary); font-size: var(--fs-label); font-weight: 600; }
 input, select { min-width: 0; border: 1px solid rgba(var(--color-primary-rgb), 0.2); border-radius: 8px; background: var(--color-white); color: var(--color-text); padding: 0.58rem 0.65rem; font: inherit; font-size: var(--fs-card-desc); }
-.planner-layout { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(260px, 0.75fr); gap: 1.25rem; align-items: start; }
-.planner-main { display: grid; gap: 1.25rem; min-width: 0; }
-.planner-sidebar { display: grid; gap: 1rem; position: sticky; top: calc(var(--navbar-height) + 1rem); }
+.planner-layout { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(260px, 0.75fr); gap: 1.25rem; align-items: start; grid-auto-rows: max-content; }
+.planner-main, .planner-sidebar { display: grid; gap: 1rem; min-width: 0; align-content: start; align-self: start; margin: 0; }
+.planner-main { padding-top: 0; }
+.route-button, .trips-button { align-self: start; }
+.sidebar-actions { display: grid; gap: 0.5rem; }
 .section-heading { margin-bottom: 1rem; }
 .section-count { color: var(--color-muted); font-size: var(--fs-small); white-space: nowrap; }
-.itinerary { margin: 1rem 0; }
-.empty-day, .empty-inline { margin: 1rem 0 0; color: var(--color-muted); font-size: var(--fs-card-desc); }
+.itinerary { margin: 0.85rem 0; }
+.empty-day, .empty-inline { margin: 0.75rem 0 0; color: var(--color-muted); font-size: var(--fs-card-desc); }
 .add-panel { margin-top: 1rem; padding: 0.9rem; border-radius: 8px; background: rgba(var(--color-primary-rgb), 0.04); }
 .add-search { width: 100%; margin-bottom: 0.75rem; }
 .add-list, .checklist { display: grid; gap: 0.45rem; margin: 0; padding: 0; list-style: none; }
@@ -184,6 +200,9 @@ input, select { min-width: 0; border: 1px solid rgba(var(--color-primary-rgb), 0
 .add-list span { display: grid; gap: 0.1rem; min-width: 0; }
 .add-list em { color: var(--color-muted); font-size: var(--fs-small); font-style: normal; }
 .add-list button { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.35rem 0.6rem; border: 0; border-radius: 999px; background: var(--color-primary); color: var(--color-white); font-size: var(--fs-small); cursor: pointer; }
+.add-list button:disabled { background: rgba(var(--color-primary-rgb), 0.12); color: var(--color-muted); cursor: default; }
+.add-list li.added { opacity: 0.75; }
+.added-message { color: var(--color-accent); font-weight: 600; }
 .expense-form { display: grid; grid-template-columns: 1fr 1.4fr 0.7fr auto; gap: 0.55rem; margin-bottom: 0.75rem; }
 .expense-row { display: grid; grid-template-columns: 1fr 1.4fr 0.7fr auto; gap: 0.55rem; }
 .icon-action, .check-toggle { display: inline-grid; place-items: center; flex: 0 0 auto; border: 0; cursor: pointer; }
@@ -201,6 +220,6 @@ input, select { min-width: 0; border: 1px solid rgba(var(--color-primary-rgb), 0
 .summary-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(var(--color-primary-rgb), 0.12); color: var(--color-muted); font-size: var(--fs-small); }
 .summary-stats strong { display: block; color: var(--color-primary); font-size: var(--fs-card-title); }
 @media (max-width: 1000px) { .trip-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } .trip-form :deep(.btn) { grid-column: 1 / -1; justify-self: start; } }
-@media (max-width: 820px) { .planner-layout { grid-template-columns: 1fr; } .planner-sidebar { position: static; } }
+@media (max-width: 820px) { .planner-layout { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .planner-header, .section-heading-row { align-items: flex-start; flex-direction: column; } .save-area, .save-area :deep(.btn) { width: 100%; } .trip-form, .expense-form, .expense-row { grid-template-columns: 1fr; } .expense-row { align-items: stretch; } .expense-row .icon-action { justify-self: end; } }
 </style>

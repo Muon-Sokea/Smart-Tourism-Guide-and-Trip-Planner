@@ -5,6 +5,8 @@ import MobileMenu from './MobileMenu.vue'
 import Icon from '../common/Icon.vue'
 import { useAuth } from '../../composables/useAuth'
 import { useTheme } from '../../composables/useTheme'
+import { useNotifications } from '../../composables/useNotifications'
+import { notificationKindMeta, relativeTime } from '../../utils/notifications'
 import { navLinks as links } from '../../data/navLinks'
 
 const route = useRoute()
@@ -13,6 +15,7 @@ const isNotificationsOpen = ref(false)
 const notificationsRef = ref<HTMLElement | null>(null)
 const { user, isLoggedIn } = useAuth()
 const { theme, toggleTheme } = useTheme()
+const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
 
 const emit = defineEmits<{
   toggleSidebar: []
@@ -31,7 +34,9 @@ const initials = computed(() => {
 })
 
 function isActive(path: string) {
-  return path === '/' ? route.path === '/' : route.path.startsWith(path)
+  if (path === '/') return route.path === '/'
+  if (path === '/services') return route.path === '/services'
+  return route.path === path || route.path.startsWith(`${path}/`)
 }
 
 function handleOutsideClick(event: MouseEvent) {
@@ -89,11 +94,44 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
                 @click="isNotificationsOpen = !isNotificationsOpen"
               >
                 <Icon name="bell" :size="17" />
+                <span v-if="unreadCount" class="icon-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
               </button>
 
               <div v-if="isNotificationsOpen" class="notifications-panel">
-                <p class="notifications-title">Notifications</p>
-                <p class="notifications-empty">You're all caught up — no new notifications.</p>
+                <div class="notifications-head">
+                  <p class="notifications-title">Notifications</p>
+                  <button
+                    v-if="unreadCount"
+                    type="button"
+                    class="mark-read-btn"
+                    @click="markAllAsRead()"
+                  >
+                    Mark all as read
+                  </button>
+                </div>
+                <ul v-if="notifications.length" class="notifications-list">
+                  <li v-for="notification in notifications.slice(0, 5)" :key="notification.id">
+                    <router-link
+                      class="notification-item"
+                      :class="{ unread: !notification.read }"
+                      :to="notification.link || '/notifications'"
+                      @click="markAsRead(notification.id); isNotificationsOpen = false"
+                    >
+                      <span class="kind-icon" :class="notificationKindMeta[notification.kind].cssClass">
+                        <Icon :name="notificationKindMeta[notification.kind].icon" :size="15" />
+                      </span>
+                      <span class="notification-text">
+                        <span class="notification-title">{{ notification.title }}</span>
+                        <span class="notification-time">{{ relativeTime(notification.createdAt) }}</span>
+                      </span>
+                      <span v-if="!notification.read" class="unread-dot" aria-label="Unread" />
+                    </router-link>
+                  </li>
+                </ul>
+                <p v-else class="notifications-empty">You're all caught up — no new notifications.</p>
+                <router-link to="/notifications" class="notifications-footer" @click="isNotificationsOpen = false">
+                  View all notifications
+                </router-link>
               </div>
             </div>
 
@@ -309,25 +347,37 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   position: absolute;
   top: calc(100% + 0.75rem);
   right: 0;
-  width: 260px;
+  width: 340px;
+  max-width: calc(100vw - 2rem);
   background: var(--color-white);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 1rem 1.1rem;
+  padding: 0.85rem;
   z-index: 5;
 }
 
-.notifications-title {
-  margin: 0 0 0.4rem;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.notifications-empty {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: var(--fs-card-desc);
-}
+.notifications-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
+.notifications-title { margin: 0; font-weight: 700; color: var(--color-primary); }
+.mark-read-btn { padding: 0; border: 0; background: none; color: var(--color-accent); font-size: 12px; font-weight: 700; cursor: pointer; }
+.mark-read-btn:hover { text-decoration: underline; }
+.notifications-list { display: grid; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.notification-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.5rem; border-radius: 8px; }
+.notification-item:hover { background: rgba(var(--color-primary-rgb), 0.05); }
+.notification-item.unread { background: rgba(var(--color-accent-rgb), 0.09); }
+.kind-icon { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; }
+.kind-icon.kind-trip { background: rgba(45, 106, 79, 0.12); color: var(--color-primary-light); }
+.kind-icon.kind-booking { background: rgba(var(--color-accent-rgb), 0.18); color: var(--color-accent); }
+.kind-icon.kind-reminder { background: rgba(var(--color-primary-rgb), 0.1); color: var(--color-primary); }
+.kind-icon.kind-travel-update { background: rgba(180, 60, 50, 0.12); color: #a33a2b; }
+.kind-icon.kind-system { background: rgba(var(--color-primary-rgb), 0.08); color: var(--color-muted); }
+.notification-text { flex: 1; min-width: 0; display: grid; gap: 0.1rem; }
+.notification-title { color: var(--color-primary); font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.notification-item.unread .notification-title { font-weight: 700; }
+.notification-time { color: var(--color-muted); font-size: 11px; }
+.unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; }
+.notifications-empty { margin: 0.25rem 0 0.5rem; color: var(--color-muted); font-size: var(--fs-card-desc); }
+.notifications-footer { display: block; margin-top: 0.5rem; padding-top: 0.6rem; border-top: 1px solid rgba(var(--color-primary-rgb), 0.1); color: var(--color-accent); font-size: 12px; font-weight: 700; text-align: center; }
+.notifications-footer:hover { text-decoration: underline; }
 
 .auth-btn {
   display: inline-flex;

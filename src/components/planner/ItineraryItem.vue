@@ -1,24 +1,39 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { ItineraryItem } from '../../types/trip'
-import type { Destination } from '../../types/destination'
+import type { ResolvedPlace } from '../../composables/useTripPlanner'
 import Icon from '../common/Icon.vue'
 
-defineProps<{
+const props = defineProps<{
   item: ItineraryItem
-  destination: Destination | undefined
+  place: ResolvedPlace | undefined
+  totalDays: number
   isLast: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   remove: [id: string]
+  move: [payload: { id: string; direction: 'up' | 'down' }]
   update: [changes: { day?: number; time?: string; durationLabel?: string }]
 }>()
+
+const dayOptions = computed(() =>
+  Array.from({ length: Math.max(props.totalDays, props.item.day) }, (_, index) => index + 1)
+)
+
+function setDay(event: Event) {
+  emit('update', { day: Number((event.target as HTMLSelectElement).value) })
+}
+
+function setTime(event: Event) {
+  emit('update', { time: (event.target as HTMLInputElement).value })
+}
 </script>
 
 <template>
   <div class="timeline-row">
     <div class="timeline-marker">
-      <span class="timeline-dot"></span>
+      <span class="timeline-dot" :class="`kind-${place?.kind ?? 'destination'}`"></span>
       <span v-if="!isLast" class="timeline-line"></span>
     </div>
 
@@ -27,26 +42,49 @@ defineEmits<{
 
       <div class="timeline-card">
         <div class="timeline-card-main">
+          <span v-if="place" class="place-kind">{{ place.kindLabel }}</span>
           <h3>
             <Icon name="map-pin" :size="16" />
-            {{ destination?.name ?? 'Unknown destination' }}
+            {{ place?.name ?? 'Unknown place' }}
           </h3>
-          <p>Visit for {{ item.durationLabel }}</p>
+          <p v-if="place">{{ place.country }} · Visit for {{ item.durationLabel }}</p>
           <div class="timeline-edit">
-            <label>Day <input :value="item.day" type="number" min="1" @change="$emit('update', { day: Number(($event.target as HTMLInputElement).value) })" /></label>
-            <label>Time <input :value="item.time" type="time" @change="$emit('update', { time: ($event.target as HTMLInputElement).value })" /></label>
-            <label>Duration <input :value="item.durationLabel" type="text" @change="$emit('update', { durationLabel: ($event.target as HTMLInputElement).value })" /></label>
+            <label>
+              Day
+              <select :value="item.day" @change="setDay">
+                <option v-for="day in dayOptions" :key="day" :value="day">Day {{ day }}</option>
+              </select>
+            </label>
+            <label>Time <input :value="item.time" type="time" @change="setTime" /></label>
           </div>
         </div>
 
-        <button
-          class="remove-btn"
-          type="button"
-          aria-label="Remove from itinerary"
-          @click="$emit('remove', item.id)"
-        >
-          <Icon name="trash" :size="16" />
-        </button>
+        <div class="timeline-actions">
+          <button
+            class="move-btn"
+            type="button"
+            aria-label="Move earlier"
+            @click="emit('move', { id: item.id, direction: 'up' })"
+          >
+            <Icon name="arrow-up" :size="15" />
+          </button>
+          <button
+            class="move-btn"
+            type="button"
+            aria-label="Move later"
+            @click="emit('move', { id: item.id, direction: 'down' })"
+          >
+            <Icon name="arrow-down" :size="15" />
+          </button>
+          <button
+            class="remove-btn"
+            type="button"
+            aria-label="Remove from itinerary"
+            @click="emit('remove', item.id)"
+          >
+            <Icon name="trash" :size="16" />
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -70,6 +108,18 @@ defineEmits<{
   border-radius: 50%;
   background: var(--color-primary);
   flex-shrink: 0;
+}
+
+.timeline-dot.kind-hotel {
+  background: var(--color-accent);
+}
+
+.timeline-dot.kind-restaurant {
+  background: #a33a2b;
+}
+
+.timeline-dot.kind-activity {
+  background: var(--color-primary-light, var(--color-primary));
 }
 
 .timeline-line {
@@ -102,6 +152,19 @@ defineEmits<{
   gap: 1rem;
 }
 
+.place-kind {
+  display: inline-block;
+  margin-bottom: 0.3rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(var(--color-accent-rgb), 0.14);
+  color: var(--color-accent);
+  font-size: var(--fs-small);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .timeline-card-main h3 {
   display: flex;
   align-items: center;
@@ -131,8 +194,9 @@ defineEmits<{
   font-size: var(--fs-small);
 }
 
-.timeline-edit input {
-  width: 86px;
+.timeline-edit input,
+.timeline-edit select {
+  min-width: 0;
   padding: 0.25rem 0.35rem;
   border: 1px solid rgba(var(--color-primary-rgb), 0.18);
   border-radius: 5px;
@@ -141,19 +205,32 @@ defineEmits<{
   font: inherit;
 }
 
-.timeline-edit label:first-child input {
-  width: 48px;
+.timeline-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
 }
 
+.move-btn,
 .remove-btn {
+  display: inline-grid;
+  place-items: center;
   border: none;
   background: transparent;
   color: var(--color-muted);
   cursor: pointer;
   padding: 0.25rem;
+  border-radius: 6px;
+}
+
+.move-btn:hover {
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.08);
 }
 
 .remove-btn:hover {
   color: var(--color-accent);
+  background: rgba(var(--color-accent-rgb), 0.1);
 }
 </style>

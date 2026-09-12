@@ -3,12 +3,14 @@ import type { Destination } from '../../types/destination'
 import RatingDisplay from './RatingDisplay.vue'
 import Icon from '../common/Icon.vue'
 import { useFavorites } from '../../composables/useFavorites'
+import { useRoute } from 'vue-router'
 
 defineProps<{
   destination: Destination
 }>()
 
 const { isFavorite, toggleFavorite } = useFavorites()
+const route = useRoute()
 </script>
 
 <template>
@@ -36,7 +38,7 @@ const { isFavorite, toggleFavorite } = useFavorites()
       <span class="card-category">{{ destination.category }}</span>
       <p class="card-description">{{ destination.description }}</p>
 
-      <router-link :to="`/explore/${destination.id}`" class="card-btn">
+      <router-link :to="{ path: `/explore/${destination.id}`, query: { from: route.fullPath } }" class="card-btn">
         View Details
       </router-link>
     </div>

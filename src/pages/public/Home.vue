@@ -441,6 +441,11 @@ const features = [
   gap: 0.6rem;
   width: 150px;
   text-align: center;
+  transition: transform 0.25s ease;
+}
+
+.category-tile:hover {
+  transform: translateY(-6px);
 }
 
 .category-tile img {
@@ -449,12 +454,23 @@ const features = [
   object-fit: cover;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.category-tile:hover img {
+  transform: scale(1.035);
+  box-shadow: 0 8px 18px rgba(27, 67, 50, 0.18);
 }
 
 .tile-caption {
   font-size: var(--fs-label);
   font-weight: 600;
   color: var(--color-primary);
+  transition: color 0.25s ease;
+}
+
+.category-tile:hover .tile-caption {
+  color: var(--color-accent);
 }
 
 .tile-offset-1 {
@@ -539,6 +555,19 @@ const features = [
   .tile-offset-1,
   .tile-offset-2 {
     margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-tile,
+  .category-tile img,
+  .tile-caption {
+    transition: none;
+  }
+
+  .category-tile:hover,
+  .category-tile:hover img {
+    transform: none;
   }
 }
 </style>

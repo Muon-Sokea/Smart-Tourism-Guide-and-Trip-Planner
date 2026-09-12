@@ -2,41 +2,60 @@
 import { computed } from 'vue'
 import { useFavorites } from '../../composables/useFavorites'
 import { destinations } from '../../data/destinations'
+import { serviceCatalog } from '../../utils/serviceCatalog'
 import DestinationGrid from '../../components/explore/DestinationGrid.vue'
+import ExploreContentCard from '../../components/explore/ExploreContentCard.vue'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 
 const { favoriteIds } = useFavorites()
 
+// Hearts work on both destination cards and service cards (hotels,
+// restaurants, activities), so the Favorites page lists both kinds.
 const favoriteDestinations = computed(() =>
   destinations.filter((destination) => favoriteIds.value.includes(destination.id))
 )
+
+const favoriteServices = computed(() =>
+  serviceCatalog.filter((service) => favoriteIds.value.includes(service.id))
+)
+
+const totalFavorites = computed(() => favoriteDestinations.value.length + favoriteServices.value.length)
 </script>
 
 <template>
   <div class="favorites">
     <div class="container">
       <header class="page-header">
-        <h1>My Favorite Destinations</h1>
+        <h1>My Favorites</h1>
         <p>Keep the places you want to visit close at hand.</p>
         <span class="favorite-count">
-          {{ favoriteDestinations.length }}
-          {{ favoriteDestinations.length === 1 ? 'destination saved' : 'destinations saved' }}
+          {{ totalFavorites }}
+          {{ totalFavorites === 1 ? 'place saved' : 'places saved' }}
         </span>
       </header>
 
-      <DestinationGrid
-        v-if="favoriteDestinations.length"
-        :destinations="favoriteDestinations"
-      />
+      <template v-if="totalFavorites">
+        <section v-if="favoriteDestinations.length">
+          <h2 class="section-title">Destinations</h2>
+          <DestinationGrid :destinations="favoriteDestinations" />
+        </section>
+
+        <section v-if="favoriteServices.length">
+          <h2 class="section-title">Stays, Food &amp; Activities</h2>
+          <div class="services-grid">
+            <ExploreContentCard v-for="item in favoriteServices" :key="item.id" :item="item" />
+          </div>
+        </section>
+      </template>
 
       <div v-else class="empty-favorites">
         <Icon name="heart" :size="40" />
-        <p class="empty-title">No favorite destinations yet.</p>
+        <p class="empty-title">No favorites yet.</p>
         <p class="empty-subtitle">
-          Explore destinations and save the places you'd love to visit.
+          Explore destinations, hotels, restaurants, and activities and save the ones you'd love to visit.
         </p>
-        <Button to="/explore" variant="accent">Explore Destinations</Button>
+        <Button to="/explore" variant="accent">Explore TravelGo</Button>
       </div>
     </div>
   </div>
@@ -72,6 +91,21 @@ const favoriteDestinations = computed(() =>
   border-radius: 999px;
 }
 
+.section-title {
+  color: var(--color-primary);
+  margin: 0 0 1rem;
+}
+
+.favorites section + section {
+  margin-top: 2rem;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.1rem;
+}
+
 .empty-favorites {
   display: flex;
   flex-direction: column;
@@ -95,6 +129,10 @@ const favoriteDestinations = computed(() =>
 }
 
 @media (max-width: 600px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
   .empty-favorites :deep(.btn) {
     width: 100%;
     max-width: 320px;

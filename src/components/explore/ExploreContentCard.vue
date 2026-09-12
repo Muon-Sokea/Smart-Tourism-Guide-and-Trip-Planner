@@ -3,12 +3,14 @@ import type { ExploreContent } from '../../types/explore'
 import Icon from '../common/Icon.vue'
 import RatingDisplay from './RatingDisplay.vue'
 import { useFavorites } from '../../composables/useFavorites'
+import { useRoute } from 'vue-router'
 
 const props = defineProps<{
   item: ExploreContent
 }>()
 
 const { isFavorite, toggleFavorite } = useFavorites()
+const route = useRoute()
 </script>
 
 <template>
@@ -37,7 +39,15 @@ const { isFavorite, toggleFavorite } = useFavorites()
         <span class="price">{{ props.item.price }}</span>
       </div>
       <p class="description">{{ props.item.description }}</p>
-      <router-link to="/explore" class="details-link">View Details</router-link>
+      <div class="card-actions">
+        <router-link
+          :to="{ name: 'service-details', params: { type: props.item.type, id: props.item.id }, query: { from: route.fullPath } }"
+          class="details-link"
+        >
+          View Details
+        </router-link>
+        <router-link :to="`/book/${props.item.type}/${props.item.id}`" class="book-link">{{ props.item.type === 'restaurant' ? 'Reserve' : 'Book Now' }}</router-link>
+      </div>
     </div>
   </article>
 </template>
@@ -50,6 +60,12 @@ const { isFavorite, toggleFavorite } = useFavorites()
   background: var(--color-white);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.content-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(27, 67, 50, 0.16);
 }
 
 .card-image-wrap {
@@ -149,6 +165,20 @@ const { isFavorite, toggleFavorite } = useFavorites()
   font-size: var(--fs-button);
   font-weight: 600;
 }
+
+.card-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: auto; }
+
+.book-link {
+  align-self: flex-start;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  color: var(--color-primary);
+  font-size: var(--fs-button);
+  font-weight: 600;
+}
+
+.book-link:hover { background: var(--color-accent); border-color: var(--color-accent); }
 
 .details-link:hover {
   background: var(--color-accent);

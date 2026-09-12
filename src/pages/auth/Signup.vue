@@ -28,7 +28,9 @@ function handleSubmit() {
 
   errorMessage.value = ''
   signup(name.value.trim(), email.value.trim())
-  router.push('/')
+  // Replace, not push: the signup page should not stay in history, so Back
+  // never returns to it (which the auth guard would immediately bounce back).
+  router.replace('/')
 }
 </script>
 

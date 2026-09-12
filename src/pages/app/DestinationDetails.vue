@@ -4,21 +4,27 @@ import { useRoute } from 'vue-router'
 import { destinations } from '../../data/destinations'
 import { useFavorites } from '../../composables/useFavorites'
 import { useTripPlanner } from '../../composables/useTripPlanner'
+import { backLabelFor, useNavHistory } from '../../composables/useNavHistory'
 import RatingDisplay from '../../components/explore/RatingDisplay.vue'
 import DestinationGrid from '../../components/explore/DestinationGrid.vue'
 import Button from '../../components/common/Button.vue'
 import Icon from '../../components/common/Icon.vue'
 
 const route = useRoute()
+// Back steps through the user's actual visit trail (step by step), falling
+// back to Explore when this page was opened directly.
+const { goBack, previousFullPath } = useNavHistory()
+const backTarget = computed(() => previousFullPath.value || '/explore')
+const backLabel = computed(() => backLabelFor(previousFullPath.value))
 const { isFavorite, toggleFavorite } = useFavorites()
-const { trip, addDestination } = useTripPlanner()
+const { addPlace, isPlaceInTrip, showPlaceAdded, lastAddedMessage } = useTripPlanner()
 
 const destination = computed(() =>
   destinations.find((item) => item.id === Number(route.params.id))
 )
 
 const isInTrip = computed(() =>
-  trip.value.items.some((item) => item.destinationId === destination.value?.id)
+  destination.value ? isPlaceInTrip('destination', destination.value.id) : false
 )
 
 const nearbyDestinations = computed(() => {
@@ -30,16 +36,18 @@ const nearbyDestinations = computed(() => {
 
 function handleAddToTrip() {
   if (!destination.value || isInTrip.value) return
-  addDestination(destination.value.id, 1)
+  if (addPlace('destination', destination.value.id, 1) === 'added') {
+    showPlaceAdded(destination.value.name)
+  }
 }
 </script>
 
 <template>
   <div class="details" v-if="destination">
     <div class="container">
-      <router-link to="/explore" class="back-link">
-        <Icon name="chevron-down" :size="16" />
-        Back to Explore
+      <router-link :to="backTarget" class="back-link" @click.prevent="goBack()">
+        <Icon name="arrow-left" :size="16" />
+        {{ backLabel }}
       </router-link>
 
       <!-- Destination Hero -->
@@ -69,10 +77,11 @@ function handleAddToTrip() {
             {{ isFavorite(destination.id) ? 'Remove from Favorites' : 'Add to Favorites' }}
           </Button>
           <Button variant="primary" :disabled="isInTrip" @click="handleAddToTrip">
-            <Icon name="plus" :size="16" />
+            <Icon :name="isInTrip ? 'check' : 'plus'" :size="16" />
             {{ isInTrip ? 'Added to Trip' : 'Add to Trip' }}
           </Button>
         </div>
+        <p v-if="lastAddedMessage" class="trip-added-note" role="status">{{ lastAddedMessage }}</p>
       </div>
 
       <!-- About Section -->
@@ -124,7 +133,7 @@ function handleAddToTrip() {
 
       <!-- Route Section -->
       <section class="route-section">
-        <Button to="/map" variant="outline">
+          <Button :to="`/map?destination=${destination.id}`" variant="outline">
           <Icon name="route" :size="16" />
           View Route
         </Button>
@@ -135,7 +144,10 @@ function handleAddToTrip() {
   <div class="details-not-found" v-else>
     <div class="container">
       <p>Destination not found.</p>
-      <router-link to="/explore" class="back-link">&larr; Back to Explore</router-link>
+      <router-link :to="backTarget" class="back-link" @click.prevent="goBack()">
+        <Icon name="arrow-left" :size="16" />
+        {{ backLabel }}
+      </router-link>
     </div>
   </div>
 </template>
@@ -200,6 +212,17 @@ function handleAddToTrip() {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.trip-added-note {
+  margin: 0.75rem 0 0;
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(var(--color-accent-rgb), 0.12);
+  color: var(--color-primary);
+  font-size: var(--fs-card-desc);
+  font-weight: 600;
+  width: fit-content;
 }
 
 .details-header h1 {
